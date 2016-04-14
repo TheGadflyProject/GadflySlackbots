@@ -1,11 +1,10 @@
 /**
  *
  */
-var baseURL = "https://gadfly-api.herokuapp.com/gadfly/api/v1.0/questions"
+var baseURL = "https://gadfly-api.herokuapp.com/gadfly/api/v1.0/gap_fill_questions"
 var http = require('http');
 var https = require('https');
 var request = require('request');
-var fs = require('fs');
 
 /**
  * Define a function for initiating a conversation on installation
@@ -88,8 +87,7 @@ controller.hears(['hello', 'hi', 'greetings'], ['direct_mention', 'mention', 'di
  });
 
 controller.hears(['http(.*)'], ['ambient', 'direct_mention', 'mention', 'direct_message'], function(bot, message) {
-    global.url = message.text.replace("<", "").replace(">", "")
-    /*getQuestions(url);*/
+    url = message.text.replace("<", "").replace(">", "")
     bot.startConversation(message, function(err, convo) {
         convo.ask('I see you posted a link. Would you like to be quizzed on it?', [
         {
@@ -103,8 +101,7 @@ controller.hears(['http(.*)'], ['ambient', 'direct_mention', 'mention', 'direct_
             pattern: bot.utterances.yes,
             callback: function(response, convo) {
                 convo.say('Cool, you said: ' + response.text);
-                getQuestions(response, convo);
-                convo.next();
+                callGadfly(convo)
             }
         },
         {
@@ -118,38 +115,6 @@ controller.hears(['http(.*)'], ['ambient', 'direct_mention', 'mention', 'direct_
     })
 });
 
-// call gadfly
-getQuestions = function(response, convo) {
-    var apiURL = baseURL + "?url=" + url;
-    var data = '';
-    https.get(apiURL, function(r) {
-        r.on('data', function(chunk) {
-            data += chunk;
-        });
-        r.on('end', function(r) {
-            obj = JSON.parse(data)
-            questions = obj['questions']
-            index = getRandomInt()
-            q = questions[index]
-        });
-    });
-/*    convo.ask('?', [
-    {
-        pattern: q.answer,
-        callback: function(response, convo) {
-            convo.say('That is correct! :100:');
-        }
-    },
-    {
-        default: false,
-        callback: function(err, convo) {
-            convo.repeat();
-            convo.next();
-        }
-    }
-    ]);*/
-}
-
 controller.hears(['more', 'next question', 'bring it on', 'next'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
     bot.startConversation(message, function(err, convo) {
         convo.ask('Ready?', [
@@ -157,8 +122,7 @@ controller.hears(['more', 'next question', 'bring it on', 'next'], ['direct_ment
             pattern: bot.utterances.yes,
             callback: function(response, convo) {
                 convo.say('Alright!')
-                askQuestions(response, convo)
-                convo.next();
+                callGadfly(convo)
             }
         },
         {
@@ -172,40 +136,40 @@ controller.hears(['more', 'next question', 'bring it on', 'next'], ['direct_ment
     });
 });
 
-function getRandomInt() {
-    return Math.floor(Math.random() * 12);
-}
-
-askQuestions = function(response, convo) {
-    fs.readFile('C:/iolab/gadfly/easy-peasy-bot/twitter.json', 'utf8', function(err, data) {
-        if (err) throw err;
-        var obj = JSON.parse(data);
-        questions = obj['questions']
+// call the gadfly web api to get questions from the user input article.
+// randomize the question to be asked using getRandomInt & push it to the conversation
+function callGadfly (convo) {
+    var apiURL = baseURL + "?url=" + url;
+    request(apiURL, function(e, r, b) {
+        if (e) { console.log(e); callback(true); return; }
+        obj = JSON.parse(b)
         index = getRandomInt()
-        q = questions[index];
-        convo.ask(q.question, function(response, convo) {
-            if (response.text == q.answer) {
-                convo.say('That is correct! :100:');
-            } else {
+        questions = obj['questions']
+        q = questions[index]
+        convo.next();
+        convo.ask(q.question, [
+        {
+            pattern: q.answer,
+            callback: function(response, convo) {
+                convo.say('That is correct! :100: Say more and mention me to get more questions.');
+                convo.next();
+            }
+        },
+        {
+            default: false,
+            callback: function(response, convo) {
                 convo.say('Whoops! That is incorrect. :frowning:');
                 convo.repeat();
+                convo.next();
             }
-            convo.next();
-        });
+        }
+        ]);
     });
-    //var apiURL = baseURL + "?url=" + url;
-    //request({method: 'GET', uri: apiURL, json: true}, function(error, response, body) {
-        //data = body['questions']
-        //convo.ask(data[1].question, function(response, convo) {
-          //  if (response.text == data[1].answer) {
-            //    convo.say('That is correct! :100:')
-  //          } else {
-    //            convo.say('Whoops! That is incorrect! :frowning:')
-      //      }
-        //    convo.repeat();
-          //  convo.next();
-       // });
-   // });
+};
+
+// get random integers between 0-12
+function getRandomInt() {
+    return Math.floor(Math.random() * 12);
 }
 
 // for personality
@@ -236,7 +200,3 @@ controller.on('direct_message, mention, direct_mention', function (bot, message)
    });
 });
 
-// get reactions
-controller.on('ambient', function(bot, message) {
-    bot.api.reactions.get()
-});
