@@ -83,7 +83,7 @@ controller.on('bot_channel_join', function (bot, message) {
     bot.reply(message, "I'm here!")
 });
 
-controller.hears(['hello', 'hi', 'greetings', 'sup', 'yo', 'what\'s up'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+controller.hears(['hey', 'hello', 'hi', 'greetings', 'sup', 'yo', 'what\'s up'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
      bot.reply(message, 'Hello!');
  });
 
@@ -141,10 +141,14 @@ controller.hears(['more', 'next', 'bring it on'], ['direct_mention', 'mention', 
 // randomize the question to be asked using getRandomInt & push it to the conversation
 function callGadfly (url, convo) {
     var apiURL = baseURL + "?url=" + url;
-    d.on('error', function(err)) {
+    d.on('error', function(err) {
+        convo.say('Uh oh! Something went wrong behind the scenes. Hold on.')
+        convo.say('I\'m just a bot so I don\'t know what went wrong but my humans will fix it.')
+        convo.next()
         console.log(err)
-    }
-    d.run(request(apiURL, function(e, r, b) {
+    });
+    d.run(function() {
+        request(apiURL, function(e, r, b) {
         if (e) { console.log(e); callback(true); return; }
         obj = JSON.parse(b)
         index = getRandomInt()
@@ -168,7 +172,8 @@ function callGadfly (url, convo) {
             }
         }
         ]);
-    });)
+    });
+    });
 };
 
 // get random integers between 0-12
