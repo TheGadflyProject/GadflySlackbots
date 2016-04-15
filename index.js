@@ -5,6 +5,7 @@ var baseURL = "https://gadfly-api.herokuapp.com/gadfly/api/v1.0/gap_fill_questio
 var http = require('http');
 var https = require('https');
 var request = require('request');
+var d = require('domain').create()
 
 /**
  * Define a function for initiating a conversation on installation
@@ -140,36 +141,34 @@ controller.hears(['more', 'next', 'bring it on'], ['direct_mention', 'mention', 
 // randomize the question to be asked using getRandomInt & push it to the conversation
 function callGadfly (url, convo) {
     var apiURL = baseURL + "?url=" + url;
-    request(apiURL, function(e, r, b) {
-        if (e) { 
-            console.log(e);
-            callback(true);
-            return;
-        } else {
-            obj = JSON.parse(b)
-            index = getRandomInt()
-            questions = obj['questions']
-            q = questions[index]
-            convo.next();
-            convo.ask(q.question, [
-            {
-                pattern: q.answer,
-                callback: function(response, convo) {
-                    convo.say('That is correct! :100: Say more and mention me to get more questions.');
-                    convo.next();
-                }
-            },
-            {
-                default: false,
-                callback: function(response, convo) {
-                    convo.say('Whoops! That is incorrect. :frowning:');
-                    convo.repeat();
-                    convo.next();
-                }
+    d.on('error', function(err)) {
+        console.log(err)
+    }
+    d.run(request(apiURL, function(e, r, b) {
+        if (e) { console.log(e); callback(true); return; }
+        obj = JSON.parse(b)
+        index = getRandomInt()
+        questions = obj['questions']
+        q = questions[index]
+        convo.next();
+        convo.ask(q.question, [
+        {
+            pattern: q.answer,
+            callback: function(response, convo) {
+                convo.say('That is correct! :100: Say more and mention me to get more questions.');
+                convo.next();
             }
-            ]);
+        },
+        {
+            default: false,
+            callback: function(response, convo) {
+                convo.say('Whoops! That is incorrect. :frowning:');
+                convo.repeat();
+                convo.next();
+            }
         }
-    });
+        ]);
+    });)
 };
 
 // get random integers between 0-12
