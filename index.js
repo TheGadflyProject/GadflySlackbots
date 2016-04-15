@@ -82,7 +82,7 @@ controller.on('bot_channel_join', function (bot, message) {
     bot.reply(message, "I'm here!")
 });
 
-controller.hears(['hello', 'hi', 'greetings'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+controller.hears(['hello', 'hi', 'greetings', 'sup', 'yo', 'what\'s up'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
      bot.reply(message, 'Hello!');
  });
 
@@ -115,7 +115,7 @@ controller.hears(['http(.*)'], ['ambient', 'direct_mention', 'mention', 'direct_
     })
 });
 
-controller.hears(['more', 'next question', 'bring it on', 'next'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+controller.hears(['more', 'next', 'bring it on'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
     bot.startConversation(message, function(err, convo) {
         convo.ask('Ready?', [
         {
@@ -141,29 +141,34 @@ controller.hears(['more', 'next question', 'bring it on', 'next'], ['direct_ment
 function callGadfly (url, convo) {
     var apiURL = baseURL + "?url=" + url;
     request(apiURL, function(e, r, b) {
-        if (e) { console.log(e); callback(true); return; }
-        obj = JSON.parse(b)
-        index = getRandomInt()
-        questions = obj['questions']
-        q = questions[index]
-        convo.next();
-        convo.ask(q.question, [
-        {
-            pattern: q.answer,
-            callback: function(response, convo) {
-                convo.say('That is correct! :100: Say more and mention me to get more questions.');
-                convo.next();
+        if (e) { 
+            console.log(e);
+            callback(true);
+            return;
+        } else {
+            obj = JSON.parse(b)
+            index = getRandomInt()
+            questions = obj['questions']
+            q = questions[index]
+            convo.next();
+            convo.ask(q.question, [
+            {
+                pattern: q.answer,
+                callback: function(response, convo) {
+                    convo.say('That is correct! :100: Say more and mention me to get more questions.');
+                    convo.next();
+                }
+            },
+            {
+                default: false,
+                callback: function(response, convo) {
+                    convo.say('Whoops! That is incorrect. :frowning:');
+                    convo.repeat();
+                    convo.next();
+                }
             }
-        },
-        {
-            default: false,
-            callback: function(response, convo) {
-                convo.say('Whoops! That is incorrect. :frowning:');
-                convo.repeat();
-                convo.next();
-            }
+            ]);
         }
-        ]);
     });
 };
 
@@ -182,7 +187,7 @@ controller.hears('open the (.*) doors',['direct_message','mention'], function(bo
 });
 
 // stop
-controller.hears(['stop', 'Stop', 'STOP'],['direct_message','mention'], function(bot, message) {
+controller.hears(['stop', 'Stop', 'STOP', 'stahp', 'STAHP'],['direct_message','mention'], function(bot, message) {
     return bot.reply(message, 'I heard you loud and clear boss.');
 });
 
@@ -199,4 +204,3 @@ controller.on('direct_message, mention, direct_mention', function (bot, message)
        bot.reply(message, 'I\'m just a poor bot, I need no sympathy, Because I\'m easy come, easy go.');
    });
 });
-
