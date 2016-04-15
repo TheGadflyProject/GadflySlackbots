@@ -101,7 +101,7 @@ controller.hears(['http(.*)'], ['ambient', 'direct_mention', 'mention', 'direct_
             pattern: bot.utterances.yes,
             callback: function(response, convo) {
                 convo.say('Cool, you said: ' + response.text);
-                callGadfly(convo)
+                callGadfly(url, convo)
             }
         },
         {
@@ -138,7 +138,7 @@ controller.hears(['more', 'next question', 'bring it on', 'next'], ['direct_ment
 
 // call the gadfly web api to get questions from the user input article.
 // randomize the question to be asked using getRandomInt & push it to the conversation
-function callGadfly (convo) {
+function callGadfly (url, convo) {
     var apiURL = baseURL + "?url=" + url;
     request(apiURL, function(e, r, b) {
         if (e) { console.log(e); callback(true); return; }
