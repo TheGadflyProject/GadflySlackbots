@@ -102,7 +102,7 @@ controller.hears(['http(.*)'], ['ambient', 'direct_mention', 'mention', 'direct_
             pattern: bot.utterances.yes,
             callback: function(response, convo) {
                 convo.say('Cool, you said: ' + response.text);
-                callGadfly(url, convo)
+                callGadfly(url, convo, bot)
             }
         },
         {
@@ -139,11 +139,11 @@ controller.hears(['more', 'next', 'bring it on'], ['direct_mention', 'mention', 
 
 // call the gadfly web api to get questions from the user input article.
 // randomize the question to be asked using getRandomInt & push it to the conversation
-function callGadfly (url, convo) {
+function callGadfly (url, convo, bot) {
     var apiURL = baseURL + "?url=" + url;
     d.on('error', function(err) {
-        convo.say('Uh oh! Something went wrong behind the scenes. Hold on.')
-        convo.say('I\'m just a bot so I don\'t know what went wrong but my humans will fix it.')
+        convo.say('Uh oh! Hang on, something went wrong behind the scenes.')
+        convo.say('I\'m just a bot so I don\'t know what went wrong. But I\'m pretty sure people will fix it.')
         convo.next()
         console.log(err)
     });
@@ -155,11 +155,28 @@ function callGadfly (url, convo) {
         questions = obj['questions']
         q = questions[index]
         convo.next();
+        convo.say('React to the question below with :white_check_mark: if you liked this question and with :x: if you think this question needs improvement.');
         convo.ask(q.question, [
         {
             pattern: q.answer,
             callback: function(response, convo) {
+                msg = {}
                 convo.say('That is correct! :100: Say more and mention me to get more questions.');
+                /*for (i in convo.responses) {
+                    if (q.question == i) {
+                        msg.ts = convo.responses[i].ts;
+                        msg.channel = convo.responses[i].channel;
+                    }
+                }
+                bot.api.reactions.get({
+                    timestamp: msg.ts,
+                    channel: msg.channel
+                }, function(err) {
+                    if (err) {
+                        console.log(err)
+                    }
+                    console.log()
+                });*/
                 convo.next();
             }
         },
@@ -181,7 +198,24 @@ function getRandomInt() {
     return Math.floor(Math.random() * 12);
 }
 
+// stop
+controller.hears(['stop', 'Stop', 'STOP', 'stahp', 'STAHP'],['direct_message','mention'], function(bot, message) {
+    return bot.reply(message, 'I heard you loud and clear boss.');
+});
+
 // for personality
+controller.hears(['who are you', 'are you a bot', 'what are you'], ['direct_message','mention','direct_mention'], function (bot, message) {
+    bot.api.reactions.add({
+        timestamp: message.ts,
+        channel: message.channel,
+        name: 'robot_face',
+    }, function (err) {
+        if (err) {
+            console.log(err)
+        }
+        bot.reply(message, 'I\'m just a poor bot, I need no sympathy, Because I\'m easy come, easy go.');
+    });
+});
 controller.hears('open the (.*) doors',['direct_message','mention'], function(bot, message) {
   var doorType = message.match[1]; //match[1] is the (.*) group. match[0] is the entire group (open the (.*) doors).
   if (doorType === 'pod bay') {
@@ -190,21 +224,12 @@ controller.hears('open the (.*) doors',['direct_message','mention'], function(bo
   return bot.reply(message, 'Okay');
 });
 
-// stop
-controller.hears(['stop', 'Stop', 'STOP', 'stahp', 'STAHP'],['direct_message','mention'], function(bot, message) {
-    return bot.reply(message, 'I heard you loud and clear boss.');
-});
+//monitor reactions
+controller.on('reaction_added', function(bot, message) {
+    console.log(message.reaction)
+})
 
 // all un-handled direct mentions get a reaction and a pat response!
 controller.on('direct_message, mention, direct_mention', function (bot, message) {
-   bot.api.reactions.add({
-       timestamp: message.ts,
-       channel: message.channel,
-       name: 'robot_face',
-   }, function (err) {
-       if (err) {
-           console.log(err)
-       }
-       bot.reply(message, 'I\'m just a poor bot, I need no sympathy, Because I\'m easy come, easy go.');
-   });
+    bot.reply(message, 'Hi there! I\'m a bot. If you paste a news article URL here, I can ask you questions about it.');
 });
