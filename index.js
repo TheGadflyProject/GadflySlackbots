@@ -193,7 +193,7 @@ function callGadfly (url, convo, bot) {
             callback: function(response, convo) {
                 convo.say('I heard you loud and clear boss.');
             }
-        }
+        },
         {
             default: true,
             callback: function(response, convo) {
