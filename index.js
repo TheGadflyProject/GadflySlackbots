@@ -88,7 +88,7 @@ controller.hears(['what\'s your purpose', 'why are you here', 'what do you do'],
 });
 
 controller.hears(['hey', 'hello', 'hi', 'greetings', 'sup', 'yo'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
-     bot.reply(message, 'Hello!');
+     bot.reply(message, 'Hi there! I\'m a bot. If you paste a news article URL here, I can ask you questions about it.');
  });
 
 controller.hears(['http(.*)'], ['ambient', 'direct_mention', 'mention', 'direct_message'], function(bot, message) {
@@ -189,7 +189,7 @@ function callGadfly (url, convo, bot) {
             }
         },
         {
-            default: false,
+            default: true,
             callback: function(response, convo) {
                 convo.say('Whoops! That is incorrect. :frowning:');
                 convo.repeat();
