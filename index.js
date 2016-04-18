@@ -189,6 +189,12 @@ function callGadfly (url, convo, bot) {
             }
         },
         {
+            pattern: 'stop',
+            callback: function(response, convo) {
+                convo.say('I heard you loud and clear boss.');
+            }
+        }
+        {
             default: true,
             callback: function(response, convo) {
                 convo.say('Whoops! That is incorrect. :frowning:');
