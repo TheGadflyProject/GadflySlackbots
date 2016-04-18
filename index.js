@@ -13,7 +13,7 @@ var d = require('domain').create()
  */
 function onInstallation(bot, installer) {
     if (installer) {
-        bot.startPrivateConversation({user: installer}, function (err, convo) {
+        bot.startPrivateConversation({user: installer}, function(err, convo) {
             if (err) {
                 console.log(err);
             } else {
@@ -66,11 +66,11 @@ if (process.env.TOKEN || process.env.SLACK_TOKEN) {
  * TODO: fixed b0rked reconnect behavior
  */
 // Handle events related to the websocket connection to Slack
-controller.on('rtm_open', function (bot) {
+controller.on('rtm_open', function(bot) {
     console.log('** The RTM api just connected!');
 });
 
-controller.on('rtm_close', function (bot) {
+controller.on('rtm_close', function(bot) {
     console.log('** The RTM api just closed');
     // you may want to attempt to re-open
 });
@@ -79,11 +79,15 @@ controller.on('rtm_close', function (bot) {
 /*
  * Core bot logic
  */
-controller.on('bot_channel_join', function (bot, message) {
+controller.on('bot_channel_join', function(bot, message) {
     bot.reply(message, "I'm here!")
 });
 
-controller.hears(['hey', 'hello', 'hi', 'greetings', 'sup', 'yo', 'what\'s up'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+controller.hears(['what\'s your purpose', 'why are you here', 'what do you do'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
+    bot.reply(message, 'Hi there! I\'m a bot. If you paste a news article URL here, I can ask you questions about it.');
+});
+
+controller.hears(['hey', 'hello', 'hi', 'greetings', 'sup', 'yo'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
      bot.reply(message, 'Hello!');
  });
 
@@ -123,7 +127,7 @@ controller.hears(['more', 'next', 'bring it on'], ['direct_mention', 'mention', 
             pattern: bot.utterances.yes,
             callback: function(response, convo) {
                 convo.say('Alright!')
-                callGadfly(convo)
+                callGadfly(url, convo, bot)
             }
         },
         {
@@ -145,11 +149,15 @@ function callGadfly (url, convo, bot) {
         convo.say('Uh oh! Hang on, something went wrong behind the scenes.')
         convo.say('I\'m just a bot so I don\'t know what went wrong. But I\'m pretty sure people will fix it.')
         convo.next()
-        console.log(err)
+        console.log(err.stack)
     });
     d.run(function() {
         request(apiURL, function(e, r, b) {
-        if (e) { console.log(e); callback(true); return; }
+        if (e) { 
+            console.log(e); 
+            callback(true);
+            return; 
+        }
         obj = JSON.parse(b)
         index = getRandomInt()
         questions = obj['questions']
@@ -204,12 +212,12 @@ controller.hears(['stop', 'Stop', 'STOP', 'stahp', 'STAHP'],['direct_message','m
 });
 
 // for personality
-controller.hears(['who are you', 'are you a bot', 'what are you'], ['direct_message','mention','direct_mention'], function (bot, message) {
+controller.hears(['who are you', 'are you a bot', 'what are you'], ['direct_message','mention','direct_mention'], function(bot, message) {
     bot.api.reactions.add({
         timestamp: message.ts,
         channel: message.channel,
         name: 'robot_face',
-    }, function (err) {
+    }, function(err) {
         if (err) {
             console.log(err)
         }
@@ -230,6 +238,6 @@ controller.on('reaction_added', function(bot, message) {
 })
 
 // all un-handled direct mentions get a reaction and a pat response!
-controller.on('direct_message, mention, direct_mention', function (bot, message) {
+controller.on('direct_message, mention, direct_mention', function(bot, message) {
     bot.reply(message, 'Hi there! I\'m a bot. If you paste a news article URL here, I can ask you questions about it.');
 });
