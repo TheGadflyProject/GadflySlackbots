@@ -196,7 +196,7 @@ function callGadfly (url, convo, bot) {
         {
             pattern: replies.idk,
             callback: function(response, convo) {
-                convo.say('That\'s okay! Would you like to read the article again?' + ' ' + url);
+                convo.say('That\'s okay! If you want, you can read the article here' + ' ' + url);
                 convo.next();
             }
         },
