@@ -7,6 +7,11 @@ var https = require('https');
 var request = require('request');
 var d = require('domain').create()
 
+replies = {
+    idk: new RegExp(/^(idk|not sure|i don\'t know|don\'t know')/i),
+    stop: new RegExp(/^(stop|Stop|STOP)/i),
+};
+
 /**
  * Define a function for initiating a conversation on installation
  * With custom integrations, we don't have a way to find out who installed us, so we can't message them :(
@@ -189,9 +194,17 @@ function callGadfly (url, convo, bot) {
             }
         },
         {
-            pattern: 'stop',
+            pattern: replies.idk,
+            callback: function(response, convo) {
+                convo.say('That\'s okay! Would you like to read the article again?' + ' ' + url);
+                convo.next();
+            }
+        },
+        {
+            pattern: replies.stop,
             callback: function(response, convo) {
                 convo.say('I heard you loud and clear boss.');
+                convo.next();
             }
         },
         {
