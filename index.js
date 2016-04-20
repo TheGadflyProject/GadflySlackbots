@@ -165,21 +165,21 @@ function callGadfly (url, convo, bot) {
         }
         obj = JSON.parse(b)
         questions = obj['questions']
-        index = getRandomInt(Object.keys(questions).length)
+        index = getRandomInt(obj['num_questions'])
         q = questions[index]
         convo.next();
-        convo.ask(q.question, [
+        convo.ask(q.question_text, [
         {
-            pattern: q.answer,
+            pattern: q.correct_answer,
             callback: function(response, convo) {
                 msg = {}
                 currentChannel = convo.source_message.channel;
-                for (i in convo.responses) {
+                /*for (i in convo.responses) {
                     if (q.question == i) {
                         msg.ts = convo.responses[i].ts;
                         msg.channel = currentChannel;
                     }
-                }
+                }*/
                 convo.say('That is correct! :100: Say more and mention me to get more questions.');
                 bot.say({
                     text: 'Click on the :white_check_mark: if you liked this question or the :x: if you think this question needs improvement.',
