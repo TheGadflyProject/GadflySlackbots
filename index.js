@@ -89,11 +89,11 @@ controller.on('bot_channel_join', function(bot, message) {
 });
 
 controller.hears(['what\'s your purpose', 'why are you here', 'what do you do'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
-    bot.reply(message, 'Hi there! I\'m a bot. If you paste a news article URL here, I can ask you questions about it.');
+    bot.reply(message, 'Hi there! I\'m a bot. If you paste a news article URL in this channel, I can start asking you questions about it.');
 });
 
 controller.hears(['hey', 'hello', 'hi', 'greetings', 'sup', 'yo'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
-     bot.reply(message, 'Hi there! I\'m a bot. If you paste a news article URL here, I can ask you questions about it.');
+     bot.reply(message, 'Hi there! I\'m a bot. If you paste a news article URL in this channel, I can start asking you questions about it.');
  });
 
 controller.hears(['http(.*)'], ['ambient', 'direct_mention', 'mention', 'direct_message'], function(bot, message) {
@@ -176,11 +176,10 @@ function callGadfly (url, convo, bot) {
                 currentChannel = convo.source_message.channel;
                 convo.say('That is correct! :100: Say more and mention me to get more questions.');
                 bot.say({
-                    text: 'Click on the :white_check_mark: if you liked this question or the :x: if you think this question needs improvement.',
+                    text: 'Click on the :thumbsup: if you liked this question or the :thumbsdown: if you think this question needs improvement.',
                     channel: currentChannel
                 });
-                if (currentChannel[0] == 'G') {
-                    bot.api.groups.history({
+                bot.api.group.history({
                     channel: currentChannel,
                     count: 1,
                     inclusive: 1
@@ -191,24 +190,14 @@ function callGadfly (url, convo, bot) {
                     bot.api.reactions.add({
                         timestamp: body.messages[0].ts,
                         channel: currentChannel,
-                        name: 'white_check_mark'
+                        name: 'thumbsup'
                     }); 
                     bot.api.reactions.add({
                         timestamp: body.messages[0].ts,
                         channel: currentChannel,
-                        name: 'x'
+                        name: 'thumbsdown'
                     });
                 });
-                }
-                /*bot.api.reactions.get({
-                    timestamp: msg.ts,
-                    channel: msg.channel
-                }, function(err) {
-                    if (err) {
-                        console.log(err)
-                    }
-                    console.log()
-                });*/
                 convo.next();
             }
         },
@@ -271,9 +260,11 @@ controller.hears('open the (.*) doors',['direct_message','mention'], function(bo
 });
 
 //monitor reactions
-/*controller.on('reaction_added', function(bot, message) {
-    console.log(message.reaction)
-})*/
+controller.on('reaction_added', function(bot, message) {
+    if (message.user != 'U11CYN007') {
+        console.log(message.reaction)
+    }
+})
 
 // all un-handled direct mentions get a reaction and a pat response!
 controller.on('direct_message, mention, direct_mention', function(bot, message) {
