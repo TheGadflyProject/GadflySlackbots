@@ -171,18 +171,40 @@ function callGadfly (url, convo, bot) {
         convo.ask(q.question, [
         {
             pattern: q.answer,
-            callback: function(response, convo, bot) {
+            callback: function(response, convo) {
                 msg = {}
-                convo.say('That is correct! :100: Say more and mention me to get more questions.');
-                convo.say('Click on the :white_check_mark: if you liked this question or the :x: if you think this question needs improvement.');
-                console.log(message)
-                /*for (i in convo.responses) {
+                currentChannel = convo.source_message.channel;
+                for (i in convo.responses) {
                     if (q.question == i) {
                         msg.ts = convo.responses[i].ts;
-                        msg.channel = convo.responses[i].channel;
+                        msg.channel = currentChannel;
                     }
                 }
-                bot.api.reactions.get({
+                convo.say('That is correct! :100: Say more and mention me to get more questions.');
+                bot.say({
+                    text: 'Click on the :white_check_mark: if you liked this question or the :x: if you think this question needs improvement.',
+                    channel: currentChannel
+                });
+                bot.api.im.history({
+                    channel: currentChannel,
+                    count: 1,
+                    inclusive: 1
+                }, function (err, body) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    bot.api.reactions.add({
+                        timestamp: body.messages[0].ts,
+                        channel: currentChannel,
+                        name: 'white_check_mark'
+                    }); 
+                    bot.api.reactions.add({
+                        timestamp: body.messages[0].ts,
+                        channel: currentChannel,
+                        name: 'x'
+                    });
+                });
+                /*bot.api.reactions.get({
                     timestamp: msg.ts,
                     channel: msg.channel
                 }, function(err) {
