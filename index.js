@@ -185,7 +185,7 @@ function callGadfly (url, convo, bot) {
                     text: 'Click on the :white_check_mark: if you liked this question or the :x: if you think this question needs improvement.',
                     channel: currentChannel
                 });
-                bot.api.group.history({
+                bot.api.groups.history({
                     channel: currentChannel,
                     count: 1,
                     inclusive: 1
