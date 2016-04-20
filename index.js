@@ -164,17 +164,18 @@ function callGadfly (url, convo, bot) {
             return; 
         }
         obj = JSON.parse(b)
-        index = getRandomInt()
         questions = obj['questions']
+        index = getRandomInt(Object.keys(questions).length)
         q = questions[index]
         convo.next();
-        convo.say('React to the question below with :white_check_mark: if you liked this question and with :x: if you think this question needs improvement.');
         convo.ask(q.question, [
         {
             pattern: q.answer,
-            callback: function(response, convo) {
+            callback: function(response, convo, bot) {
                 msg = {}
                 convo.say('That is correct! :100: Say more and mention me to get more questions.');
+                convo.say('Click on the :white_check_mark: if you liked this question or the :x: if you think this question needs improvement.');
+                console.log(message)
                 /*for (i in convo.responses) {
                     if (q.question == i) {
                         msg.ts = convo.responses[i].ts;
@@ -221,8 +222,8 @@ function callGadfly (url, convo, bot) {
 };
 
 // get random integers between 0-12
-function getRandomInt() {
-    return Math.floor(Math.random() * 12);
+function getRandomInt(range) {
+    return Math.floor(Math.random() * range);
 }
 
 // stop
@@ -252,9 +253,9 @@ controller.hears('open the (.*) doors',['direct_message','mention'], function(bo
 });
 
 //monitor reactions
-controller.on('reaction_added', function(bot, message) {
+/*controller.on('reaction_added', function(bot, message) {
     console.log(message.reaction)
-})
+})*/
 
 // all un-handled direct mentions get a reaction and a pat response!
 controller.on('direct_message, mention, direct_mention', function(bot, message) {
