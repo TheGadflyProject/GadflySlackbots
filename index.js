@@ -179,7 +179,7 @@ function callGadfly (url, convo, bot) {
                     text: 'Click on the :thumbsup: if you liked this question or the :thumbsdown: if you think this question needs improvement.',
                     channel: currentChannel
                 });
-                bot.api.group.history({
+                bot.api.groups.history({
                     channel: currentChannel,
                     count: 1,
                     inclusive: 1
