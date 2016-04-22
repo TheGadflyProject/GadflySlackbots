@@ -1,7 +1,8 @@
 /**
  *
  */
-var baseURL = "https://gadfly-api.herokuapp.com/gadfly/api/v1.0/gap_fill_questions"
+var gapFillURL = "https://gadfly-api.herokuapp.com/gadfly/api/v1.0/gap_fill_questions"
+var mcqURL = "https://gadfly-api.herokuapp.com/gadfly/api/v1.0/multiple_choice_questions"
 var http = require('http');
 var https = require('https');
 var request = require('request');
@@ -111,7 +112,7 @@ controller.hears(['http(.*)'], ['ambient', 'direct_mention', 'mention', 'direct_
             pattern: bot.utterances.yes,
             callback: function(response, convo) {
                 convo.say('Cool, you said: ' + response.text);
-                callGadfly(url, convo, bot)
+                callGadflyGapFill(url, convo, bot)
             }
         },
         {
@@ -132,7 +133,7 @@ controller.hears(['more', 'next', 'bring it on'], ['direct_mention', 'mention', 
             pattern: bot.utterances.yes,
             callback: function(response, convo) {
                 convo.say('Alright!')
-                callGadfly(url, convo, bot)
+                callGadflyGapFill(url, convo, bot)
             }
         },
         {
@@ -146,10 +147,10 @@ controller.hears(['more', 'next', 'bring it on'], ['direct_mention', 'mention', 
     });
 });
 
-// call the gadfly web api to get questions from the user input article.
+// call the gadfly web api to get gap fill questions from the user input article.
 // randomize the question to be asked using getRandomInt & push it to the conversation
-function callGadfly (url, convo, bot) {
-    var apiURL = baseURL + "?url=" + url;
+function callGadflyGapFill (url, convo, bot) {
+    var apiURL = gapFillURL + "?url=" + url;
     d.on('error', function(err) {
         convo.say('Uh oh! Hang on, something went wrong behind the scenes.')
         convo.say('I\'m just a bot so I don\'t know what went wrong. But I\'m pretty sure people will fix it.')
@@ -158,11 +159,7 @@ function callGadfly (url, convo, bot) {
     });
     d.run(function() {
         request(apiURL, function(e, r, b) {
-        if (e) { 
-            console.log(e); 
-            callback(true);
-            return; 
-        }
+        if (e) { console.log(e); callback(true); return; }
         obj = JSON.parse(b)
         questions = obj['questions']
         index = getRandomInt(obj['num_questions'])
@@ -218,7 +215,128 @@ function callGadfly (url, convo, bot) {
         {
             default: true,
             callback: function(response, convo) {
+                msg = {}
+                currentChannel = convo.source_message.channel;
                 convo.say('Whoops! That is incorrect. :frowning:');
+                bot.api.groups.history({
+                    channel: currentChannel,
+                    count: 1,
+                    inclusive: 1
+                }, function (err, body) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    bot.api.reactions.add({
+                        timestamp: body.messages[0].ts,
+                        channel: currentChannel,
+                        name: 'thumbsup'
+                    }); 
+                    bot.api.reactions.add({
+                        timestamp: body.messages[0].ts,
+                        channel: currentChannel,
+                        name: 'thumbsdown'
+                    });
+                });
+                convo.repeat();
+                convo.next();
+            }
+        }
+        ]);
+    });
+    });
+};
+
+// call the gadfly web api to get multiple choice questions from the user input article.
+// randomize the question to be asked using getRandomInt & push it to the conversation
+function callGadflyMCQ(url, convo, bot) {
+    var apiURL = mcqURL + "?url=" + url;
+    d.on('error', function(err) {
+        convo.say('Uh oh! Hang on, something went wrong behind the scenes.')
+        convo.say('I\'m just a bot so I don\'t know what went wrong. But I\'m pretty sure people will fix it.')
+        convo.next()
+        console.log(err.stack)
+    });
+    d.run(function() {
+        request(apiURL, function(e, r, b) {
+        if (e) { console.log(e); callback(true); return; }
+        obj = JSON.parse(b)
+        questions = obj['questions']
+        index = getRandomInt(obj['num_questions'])
+        q = questions[index]
+        choices = q.answer_choices
+        convo.next();
+        convo.ask(q.question + '\n\n' + ':one:\t' + choices[0] + '\n' + ':two:\t' + choices[1] + '\n' + ':three:\t' + choices[2] + '\n' + ':four:\t' + choices[3], [
+        {
+            pattern: q.answer,
+            callback: function(response, convo) {
+                msg = {}
+                currentChannel = convo.source_message.channel;
+                convo.say('That is correct! :100: Say more and mention me to get more questions.');
+                bot.say({
+                    text: 'Click on the :thumbsup: if you liked this question or the :thumbsdown: if you think this question needs improvement.',
+                    channel: currentChannel
+                });
+                bot.api.groups.history({
+                    channel: currentChannel,
+                    count: 1,
+                    inclusive: 1
+                }, function (err, body) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    bot.api.reactions.add({
+                        timestamp: body.messages[0].ts,
+                        channel: currentChannel,
+                        name: 'thumbsup'
+                    }); 
+                    bot.api.reactions.add({
+                        timestamp: body.messages[0].ts,
+                        channel: currentChannel,
+                        name: 'thumbsdown'
+                    });
+                });
+                convo.next();
+            }
+        },
+        {
+            pattern: replies.idk,
+            callback: function(response, convo) {
+                convo.say('That\'s okay! If you want, you can read the article here' + ' ' + url);
+                convo.next();
+            }
+        },
+        {
+            pattern: replies.stop,
+            callback: function(response, convo) {
+                convo.say('I heard you loud and clear boss.');
+                convo.next();
+            }
+        },
+        {
+            default: true,
+            callback: function(response, convo) {
+                msg = {}
+                currentChannel = convo.source_message.channel;
+                convo.say('Whoops! That is incorrect. :frowning:');
+                bot.api.groups.history({
+                    channel: currentChannel,
+                    count: 1,
+                    inclusive: 1
+                }, function (err, body) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    bot.api.reactions.add({
+                        timestamp: body.messages[0].ts,
+                        channel: currentChannel,
+                        name: 'thumbsup'
+                    }); 
+                    bot.api.reactions.add({
+                        timestamp: body.messages[0].ts,
+                        channel: currentChannel,
+                        name: 'thumbsdown'
+                    });
+                });
                 convo.repeat();
                 convo.next();
             }
@@ -261,9 +379,8 @@ controller.hears('open the (.*) doors',['direct_message','mention'], function(bo
 
 //monitor reactions
 controller.on('reaction_added', function(bot, message) {
-    if (message.user != 'U11CYN007') {
-        console.log(message.reaction)
-    }
+    console.log(message.reaction);
+    console.log(message.user);
 })
 
 // all un-handled direct mentions get a reaction and a pat response!
