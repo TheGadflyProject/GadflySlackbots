@@ -176,68 +176,14 @@ function callGadflyGapFill (url, convo, bot) {
                     text: 'Click on the :thumbsup: if you liked this question or the :thumbsdown: if you think this question needs improvement.',
                     channel: currentChannel
                 });
-                if (currentChannel[0] == 'C') {
-                    bot.api.channels.history({
-                    channel: currentChannel,
-                    count: 1,
-                    inclusive: 1
-                }, function (err, body) {
-                    if (err) {
-                        console.log(err);
-                    }
-                    bot.api.reactions.add({
-                        timestamp: body.messages[0].ts,
-                        channel: currentChannel,
-                        name: 'thumbsup'
-                    }); 
-                    bot.api.reactions.add({
-                        timestamp: body.messages[0].ts,
-                        channel: currentChannel,
-                        name: 'thumbsdown'
-                    });
-                });
+                if (currentChannel[0] == 'G') {
+                    botIsInAGroup(bot, currentChannel);
                 }
                 if (currentChannel[0] == 'D') {
-                    bot.api.im.history({
-                    channel: currentChannel,
-                    count: 1,
-                    inclusive: 1
-                }, function (err, body) {
-                    if (err) {
-                        console.log(err);
-                    }
-                    bot.api.reactions.add({
-                        timestamp: body.messages[0].ts,
-                        channel: currentChannel,
-                        name: 'thumbsup'
-                    }); 
-                    bot.api.reactions.add({
-                        timestamp: body.messages[0].ts,
-                        channel: currentChannel,
-                        name: 'thumbsdown'
-                    });
-                });
+                    botIsInADM(bot, currentChannel);
                 }
-                if (currentChannel[0] == 'G') {
-                    bot.api.groups.history({
-                    channel: currentChannel,
-                    count: 1,
-                    inclusive: 1
-                }, function (err, body) {
-                    if (err) {
-                        console.log(err);
-                    }
-                    bot.api.reactions.add({
-                        timestamp: body.messages[0].ts,
-                        channel: currentChannel,
-                        name: 'thumbsup'
-                    }); 
-                    bot.api.reactions.add({
-                        timestamp: body.messages[0].ts,
-                        channel: currentChannel,
-                        name: 'thumbsdown'
-                    });
-                });
+                if (currentChannel[0] == 'C') {
+                    botIsInAChannel(bot, currentChannel);
                 }
                 convo.next();
             }
@@ -262,25 +208,15 @@ function callGadflyGapFill (url, convo, bot) {
                 msg = {}
                 currentChannel = convo.source_message.channel;
                 convo.say('Whoops! That is incorrect. :frowning:');
-                bot.api.groups.history({
-                    channel: currentChannel,
-                    count: 1,
-                    inclusive: 1
-                }, function (err, body) {
-                    if (err) {
-                        console.log(err);
-                    }
-                    bot.api.reactions.add({
-                        timestamp: body.messages[0].ts,
-                        channel: currentChannel,
-                        name: 'thumbsup'
-                    }); 
-                    bot.api.reactions.add({
-                        timestamp: body.messages[0].ts,
-                        channel: currentChannel,
-                        name: 'thumbsdown'
-                    });
-                });
+                if (currentChannel[0] == 'G') {
+                    botIsInAGroup(bot, currentChannel);
+                }
+                if (currentChannel[0] == 'D') {
+                    botIsInADM(bot, currentChannel);
+                }
+                if (currentChannel[0] == 'C') {
+                    botIsInAChannel(bot, currentChannel);
+                }
                 convo.repeat();
                 convo.next();
             }
@@ -320,25 +256,15 @@ function callGadflyMCQ(url, convo, bot) {
                     text: 'Click on the :thumbsup: if you liked this question or the :thumbsdown: if you think this question needs improvement.',
                     channel: currentChannel
                 });
-                bot.api.groups.history({
-                    channel: currentChannel,
-                    count: 1,
-                    inclusive: 1
-                }, function (err, body) {
-                    if (err) {
-                        console.log(err);
-                    }
-                    bot.api.reactions.add({
-                        timestamp: body.messages[0].ts,
-                        channel: currentChannel,
-                        name: 'thumbsup'
-                    }); 
-                    bot.api.reactions.add({
-                        timestamp: body.messages[0].ts,
-                        channel: currentChannel,
-                        name: 'thumbsdown'
-                    });
-                });
+                if (currentChannel[0] == 'G') {
+                    botIsInAGroup(bot, currentChannel);
+                }
+                if (currentChannel[0] == 'D') {
+                    botIsInADM(bot, currentChannel);
+                }
+                if (currentChannel[0] == 'C') {
+                    botIsInAChannel(bot, currentChannel);
+                }
                 convo.next();
             }
         },
@@ -362,25 +288,15 @@ function callGadflyMCQ(url, convo, bot) {
                 msg = {}
                 currentChannel = convo.source_message.channel;
                 convo.say('Whoops! That is incorrect. :frowning:');
-                bot.api.groups.history({
-                    channel: currentChannel,
-                    count: 1,
-                    inclusive: 1
-                }, function (err, body) {
-                    if (err) {
-                        console.log(err);
-                    }
-                    bot.api.reactions.add({
-                        timestamp: body.messages[0].ts,
-                        channel: currentChannel,
-                        name: 'thumbsup'
-                    }); 
-                    bot.api.reactions.add({
-                        timestamp: body.messages[0].ts,
-                        channel: currentChannel,
-                        name: 'thumbsdown'
-                    });
-                });
+                if (currentChannel[0] == 'G') {
+                    botIsInAGroup(bot, currentChannel);
+                }
+                if (currentChannel[0] == 'D') {
+                    botIsInADM(bot, currentChannel);
+                }
+                if (currentChannel[0] == 'C') {
+                    botIsInAChannel(bot, currentChannel);
+                }
                 convo.repeat();
                 convo.next();
             }
@@ -389,6 +305,75 @@ function callGadflyMCQ(url, convo, bot) {
     });
     });
 };
+
+// if the bot is in a group
+function botIsInAGroup(bot, currentChannel) {
+    bot.api.groups.history({
+        channel: currentChannel,
+        count: 1,
+        inclusive: 1
+    }, function (err, body) {
+        if (err) {
+            console.log(err);
+        }
+        bot.api.reactions.add({
+            timestamp: body.messages[0].ts,
+            channel: currentChannel,
+            name: 'thumbsup'
+        });
+        bot.api.reactions.add({
+            timestamp: body.messages[0].ts,
+            channel: currentChannel,
+            name: 'thumbsdown'
+        });
+    });
+}
+
+// if the bot is in a dm
+function botIsInADM(bot, currentChannel) {
+    bot.api.im.history({
+        channel: currentChannel,
+        count: 1,
+        inclusive: 1
+    }, function (err, body) {
+        if (err) {
+            console.log(err);
+        }
+        bot.api.reactions.add({
+            timestamp: body.messages[0].ts,
+            channel: currentChannel,
+            name: 'thumbsup'
+        });
+        bot.api.reactions.add({
+            timestamp: body.messages[0].ts,
+            channel: currentChannel,
+            name: 'thumbsdown'
+        });
+    });
+}
+
+// if the bot is in a channel
+function botIsInAChannel(bot, currentChannel) {
+    bot.api.channels.history({
+        channel: currentChannel,
+        count: 1,
+        inclusive: 1
+    }, function (err, body) {
+        if (err) {
+            console.log(err);
+        }
+        bot.api.reactions.add({
+            timestamp: body.messages[0].ts,
+            channel: currentChannel,
+            name: 'thumbsup'
+        });
+        bot.api.reactions.add({
+            timestamp: body.messages[0].ts,
+            channel: currentChannel,
+            name: 'thumbsdown'
+        });
+    });
+}
 
 // get random integers between 0-12
 function getRandomInt(range) {
