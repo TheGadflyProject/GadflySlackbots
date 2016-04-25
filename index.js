@@ -176,7 +176,8 @@ function callGadflyGapFill (url, convo, bot) {
                     text: 'Click on the :thumbsup: if you liked this question or the :thumbsdown: if you think this question needs improvement.',
                     channel: currentChannel
                 });
-                bot.api.groups.history({
+                if (currentChannel[0] == 'C') {
+                    bot.api.channels.history({
                     channel: currentChannel,
                     count: 1,
                     inclusive: 1
@@ -195,6 +196,49 @@ function callGadflyGapFill (url, convo, bot) {
                         name: 'thumbsdown'
                     });
                 });
+                }
+                if (currentChannel[0] == 'D') {
+                    bot.api.im.history({
+                    channel: currentChannel,
+                    count: 1,
+                    inclusive: 1
+                }, function (err, body) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    bot.api.reactions.add({
+                        timestamp: body.messages[0].ts,
+                        channel: currentChannel,
+                        name: 'thumbsup'
+                    }); 
+                    bot.api.reactions.add({
+                        timestamp: body.messages[0].ts,
+                        channel: currentChannel,
+                        name: 'thumbsdown'
+                    });
+                });
+                }
+                if (currentChannel[0] == 'G') {
+                    bot.api.groups.history({
+                    channel: currentChannel,
+                    count: 1,
+                    inclusive: 1
+                }, function (err, body) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    bot.api.reactions.add({
+                        timestamp: body.messages[0].ts,
+                        channel: currentChannel,
+                        name: 'thumbsup'
+                    }); 
+                    bot.api.reactions.add({
+                        timestamp: body.messages[0].ts,
+                        channel: currentChannel,
+                        name: 'thumbsdown'
+                    });
+                });
+                }
                 convo.next();
             }
         },
