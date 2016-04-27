@@ -125,7 +125,7 @@ function addReactions(bot, message, callback) {
             console.log(err);
         }
         lastMsg = body.messages[0];
-        fs.writeFileSync('lastMsg.ss', lastMsg.ts, 'utf8');
+        fs.writeFileSync('session.storage', lastMsg.ts, 'utf8');
         bot.api.reactions.add({
             timestamp: lastMsg.ts,
             channel: currentChannel,
