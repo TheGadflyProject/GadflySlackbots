@@ -86,10 +86,25 @@ controller.on('rtm_close', function(bot) {
  */
 controller.hears('trivia', ['ambient'], function(bot, message) {
     async.series([
+        function(callback) {postTriviaIntroduction(bot, message, callback);},
+        function(callback) {waitNSecs(3000, callback);},
         function(callback) {addTrivia(bot, message, callback);},
+        function(callback) {waitNSecs(700, callback);},
         function(callback) {addReactions(bot, message, callback);}
     ]);
 });
+
+function waitNSecs(n, callback) {
+    setTimeout(function () {
+      callback(null);
+    }, n);
+}
+
+function postTriviaIntroduction(bot, message, callback) {
+    var intro = "Hi everyone @here, it’s time to play some trivia! I’ve picked a popular article for the day and will ask a question based off of it. You have an hour to respond, but I will be giving extra points for those first to answer :simple_smile:";
+    bot.reply(message, intro);
+    callback(null);
+}
 
 // add the trivia question
 function addTrivia(bot, message, callback) {
@@ -98,7 +113,7 @@ function addTrivia(bot, message, callback) {
     question = q.question;
     choices = q.answer_choices;
     currentChannel = message.channel;
-    bot.reply(message, 
+    bot.reply(message,
         q.question + '\n\n' + ':one:\t' + choices[0] + '\n' + ':two:\t' + choices[1] + '\n' + ':three:\t' + choices[2] + '\n' + ':four:\t' + choices[3]);
     callback(null);
 }
