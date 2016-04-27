@@ -1,70 +1,16 @@
 {
+  "num_questions": 1,
+  "url": "http://www.nytimes.com/2016/04/25/technology/facebook-aims-to-drive-down-tech-prices-to-expand-its-reach.html",
   "questions": 
-    [
-      {
-        "answer": "Science Media",
-        "question": "But it does not need   said Mike Jones, the chief executive of a startincubator named ___________ .",
-        "source_sentence": "But it does not need   said Mike Jones, the chief executive of a startincubator named Science Media."
-      },
-      {
-        "answer": "Twitter",
-        "question": "Twitter should think   said Anil Dash, a longtime user of ___________ and the chief executive of ThinkUp, up that intends to improve how people use social networks. ",
-        "source_sentence": "Twitter should think   said Anil Dash, a longtime user of Twitter and the chief executive of ThinkUp, up that intends to improve how people use social networks. "
-      },
-      {
-        "answer": "ThinkUp",
-        "question": "Twitter should think   said Anil Dash, a longtime user of Twitter and the chief executive of ___________ , up that intends to improve how people use social networks. ",
-        "source_sentence": "Twitter should think   said Anil Dash, a longtime user of Twitter and the chief executive of ThinkUp, up that intends to improve how people use social networks. "
-      },
-      {
-        "answer": "Anil Dash",
-        "question": "Twitter should think   said ___________ , a longtime user of Twitter and the chief executive of ThinkUp, up that intends to improve how people use social networks. ",
-        "source_sentence": "Twitter should think   said Anil Dash, a longtime user of Twitter and the chief executive of ThinkUp, up that intends to improve how people use social networks. "
-      },
-      {
-        "answer": "Twitter",
-        "question": "Jones used to be the chief executive of Myspace, the once giant social network, but he rejected any comparison between Twitter and  now vastly diminished  ___________ has actual utility to it, and for those people,  \u2019s what will keep it around,\u201d ",
-        "source_sentence": "Jones used to be the chief executive of Myspace, the once giant social network, but he rejected any comparison between Twitter and  now vastly diminished  Twitter has actual utility to it, and for those people,  \u2019s what will keep it around,\u201d "
-      },
-      {
-        "answer": "Twitter",
-        "question": "Even  ___________ intends to remain a public corporation \u2014  there does not seem to be much appetite, nor a very obvious mechanism, for investors to take it private \u2019s time  Mr. Dorsey to reset expectations for what his company can become. ",
-        "source_sentence": "Even  Twitter intends to remain a public corporation \u2014  there does not seem to be much appetite, nor a very obvious mechanism, for investors to take it private \u2019s time  Mr. Dorsey to reset expectations for what his company can become. "
-      },
-      {
-        "answer": "Twitter",
-        "question": "This week  thousands lost their minds predicting  ___________  we know it was soon to be dead.",
-        "source_sentence": "This week  thousands lost their minds predicting  Twitter  we know it was soon to be dead."
-      },
-      {
-        "answer": "Myspace",
-        "question": "Jones used to be the chief executive of ___________ , the once giant social network, but he rejected any comparison between Twitter and  now vastly diminished  Twitter has actual utility to it, and for those people,  \u2019s what will keep it around,\u201d ",
-        "source_sentence": "Jones used to be the chief executive of Myspace, the once giant social network, but he rejected any comparison between Twitter and  now vastly diminished  Twitter has actual utility to it, and for those people,  \u2019s what will keep it around,\u201d "
-      },
-      {
-        "answer": "Jones",
-        "question": "___________ used to be the chief executive of Myspace, the once giant social network, but he rejected any comparison between Twitter and  now vastly diminished  Twitter has actual utility to it, and for those people,  \u2019s what will keep it around,\u201d ",
-        "source_sentence": "Jones used to be the chief executive of Myspace, the once giant social network, but he rejected any comparison between Twitter and  now vastly diminished  Twitter has actual utility to it, and for those people,  \u2019s what will keep it around,\u201d "
-      },
-      {
-        "answer": "Dorsey",
-        "question": "Even  Twitter intends to remain a public corporation \u2014  there does not seem to be much appetite, nor a very obvious mechanism, for investors to take it private \u2019s time  Mr. ___________ to reset expectations for what his company can become. ",
-        "source_sentence": "Even  Twitter intends to remain a public corporation \u2014  there does not seem to be much appetite, nor a very obvious mechanism, for investors to take it private \u2019s time  Mr. Dorsey to reset expectations for what his company can become. "
-      },
-      {
-        "answer": "Mike Jones",
-        "question": "But it does not need   said ___________ , the chief executive of a startincubator named Science Media.",
-        "source_sentence": "But it does not need   said Mike Jones, the chief executive of a startincubator named Science Media."
-      },
-      {
-        "answer": "Twitter",
-        "question": "___________ should think   said Anil Dash, a longtime user of Twitter and the chief executive of ThinkUp, up that intends to improve how people use social networks. ",
-        "source_sentence": "Twitter should think   said Anil Dash, a longtime user of Twitter and the chief executive of ThinkUp, up that intends to improve how people use social networks. "
-      },
-      {
-        "answer": "Twitter",
-        "question": "Jones used to be the chief executive of Myspace, the once giant social network, but he rejected any comparison between ___________ and  now vastly diminished  Twitter has actual utility to it, and for those people,  \u2019s what will keep it around,\u201d ",
-        "source_sentence": "Jones used to be the chief executive of Myspace, the once giant social network, but he rejected any comparison between Twitter and  now vastly diminished  Twitter has actual utility to it, and for those people,  \u2019s what will keep it around,\u201d "
-      }
-    ]
+    {
+      "answer": "Telecom Infra Project",
+      "answer_choices": [
+        "Facebook",
+        "Sun Microsystems",
+        "Telecom Infra Project",
+        "Nokia"
+      ],
+      "question": "Cisco Systems intends to start donating software to ___________ , hoping to profit from heavy overall usage on the world's big telecom systems.",
+      "source_sentence": "Cisco Systems intends to start donating software to Telecom Infra Project, hoping to profit from heavy overall usage on the world's big telecom systems. "
+    }
 }
