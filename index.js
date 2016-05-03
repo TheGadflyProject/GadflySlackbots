@@ -1,8 +1,8 @@
 /**
  *
  */
-var gapFillURL = "https://gadfly-api.herokuapp.com/gadfly/api/v1.0/gap_fill_questions"
-var mcqURL = "https://gadfly-api.herokuapp.com/gadfly/api/v1.0/multiple_choice_questions"
+var gapFillURL = "https://gadfly-api.herokuapp.com/gadfly/api/gap_fill_questions"
+var mcqURL = "https://gadfly-api.herokuapp.com/gadfly/api/multiple_choice_questions"
 var fs = require('fs');
 var d = require('domain').create();
 var async = require('async')
