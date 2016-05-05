@@ -1,13 +1,14 @@
 /**
- *
+ * Constants and declarations
  */
-var gapFillURL = "https://gadfly-api.herokuapp.com/gadfly/api/gap_fill_questions"
-var mcqURL = "https://gadfly-api.herokuapp.com/gadfly/api/multiple_choice_questions"
+var gapFillURL = "http://api.gadflyproject.com/api/gap_fill_questions"
+var mcqURL = "http://gadfly-api.herokuapp.com/api/multiple_choice_questions"
 var http = require('http');
 var https = require('https');
 var request = require('request');
 var d = require('domain').create()
 
+// A pattern library to match specific conversational constructs
 replies = {
     idk: new RegExp(/^(idk|not sure|i don\'t know|don\'t know')/i),
     stop: new RegExp(/^(stop|Stop|STOP)/i),
@@ -89,14 +90,6 @@ controller.on('bot_channel_join', function(bot, message) {
     bot.reply(message, "I'm here!")
 });
 
-controller.hears(['what\'s your purpose', 'why are you here', 'what do you do'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
-    bot.reply(message, 'Hi there! I\'m a bot. If you paste a news article URL in this channel, I can start asking you questions about it.');
-});
-
-controller.hears(['hey', 'hello', 'hi', 'greetings', 'sup', 'yo'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
-     bot.reply(message, 'Hi there! I\'m a bot. If you paste a news article URL in this channel, I can start asking you questions about it.');
- });
-
 controller.hears(['http(.*)'], ['ambient', 'direct_mention', 'mention', 'direct_message'], function(bot, message) {
     url = message.text.replace("<", "").replace(">", "")
     bot.startConversation(message, function(err, convo) {
@@ -160,7 +153,9 @@ function callGadflyGapFill (url, convo, bot) {
     d.run(function() {
         request(apiURL, function(e, r, b) {
         if (e) { console.log(e); callback(true); return; }
+        console.log(b)
         obj = JSON.parse(b)
+        console.log(obj)
         questions = obj['questions']
         index = getRandomInt(obj['num_questions'])
         q = questions[index]
