@@ -1,12 +1,13 @@
 /**
- *
+ * Constants and declarations
  */
-var gapFillURL = "https://gadfly-api.herokuapp.com/gadfly/api/gap_fill_questions"
-var mcqURL = "https://gadfly-api.herokuapp.com/gadfly/api/multiple_choice_questions"
+var gapFillURL = "http://api.gadflyproject.com/api/gap_fill_questions"
+var mcqURL = "http://api.gadflyproject.com/api/multiple_choice_questions"
 var fs = require('fs');
 var d = require('domain').create();
 var async = require('async')
 
+// A pattern library for conversational constructs.
 replies = {
     idk: new RegExp(/^(idk|not sure|i don\'t know|don\'t know')/i),
     stop: new RegExp(/^(stop|Stop|STOP)/i),
