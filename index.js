@@ -1,15 +1,18 @@
 /**
  *
  */
-var gapFillURL = "https://gadfly-api.herokuapp.com/gadfly/api/gap_fill_questions"
-var mcqURL = "https://gadfly-api.herokuapp.com/gadfly/api/multiple_choice_questions"
+var gapFillURL = "https://gadfly-api.herokuapp.com/gadfly/api/gap_fill_questions";
+var mcqURL = "https://gadfly-api.herokuapp.com/gadfly/api/multiple_choice_questions";
 var fs = require('fs');
 var d = require('domain').create();
-var async = require('async')
+var async = require('async');
+var schedule = require('node-schedule');
+var request = require("request");
+
 
 replies = {
-    idk: new RegExp(/^(idk|not sure|i don\'t know|don\'t know')/i),
-    stop: new RegExp(/^(stop|Stop|STOP)/i),
+    idk: new RegExp(/^(idk|not\ sure|i\ don\'t\ know|don\'t\ know')/i),
+    stop: new RegExp(/^(stop|Stop|STOP)/i)
 };
 
 /**
@@ -80,6 +83,31 @@ controller.on('rtm_close', function(bot) {
     // you may want to attempt to re-open
 });
 
+/* Automation for gathering top articles from NYT
+and generating MCQ in json*/
+
+var rule = new schedule.RecurrenceRule();
+rule.dayOfWeek = [0, new schedule.Range(1, 6)];
+// rule.hour = 15;
+// rule.minute = 0;
+
+
+var j = schedule.scheduleJob(rule, function(){
+    var url1, url2, url3;
+    request.get({
+      url: "https://api.nytimes.com/svc/mostpopular/v2/mostemailed/all-sections/1.json",
+      qs: {
+        'api-key': "f5216a41176d45d5ab8904d74eb88d21"
+      },
+    }, function(err, response, body) {
+      body = JSON.parse(body);
+      url1 = body.results[0].url;
+      url2 = body.results[1].url;
+      url3 = body.results[2].url;
+    })
+});
+
+
 /*
  * Core bot logic
  */
@@ -92,6 +120,7 @@ controller.hears('trivia', ['ambient'], function(bot, message) {
         function(callback) {addReactions(bot, message, callback);}
     ]);
 });
+
 
 // introduce yourself to the trivia crowd!
 function postTriviaIntroduction(bot, message, callback) {
@@ -112,7 +141,7 @@ function addTrivia(bot, message, callback) {
     callback(null);
 }
 
-// use the slack api to locate the last message in the channel we are in right now 
+// use the slack api to locate the last message in the channel we are in right now
 // then use the slack api to add reactions to that message
 function addReactions(bot, message, callback) {
     var currentChannel = message.channel;
