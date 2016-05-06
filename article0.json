@@ -1,0 +1,15 @@
+{
+  "num_questions": 1,
+  "questions": [
+    {
+      "answer": "Oreos",
+      "answer_choices": [
+        "the United States",
+        "Oreos",
+        "Finland"
+      ],
+      "question": "Four days later, a brief stressor leads them to eat almost twice as many ___________ as animals that received the stressor but did not have their diets restricted.",
+      "source_sentence": "Four days later, a brief stressor leads them to eat almost twice as many Oreos as animals that received the stressor but did not have their diets restricted. "
+    }
+  ]
+}

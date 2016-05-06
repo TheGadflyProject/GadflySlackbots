@@ -3,6 +3,7 @@
  */
 var gapFillURL = "https://api.gadflyproject.com/api/gap_fill_questions";
 var mcqURL = "https://gadfly-api.herokuapp.com/api/multiple_choice_questions";
+var articleCount=3;
 var fs = require('fs');
 var d = require('domain').create();
 var async = require('async');
@@ -101,15 +102,12 @@ var j = schedule.scheduleJob(rule, function(){
       },
     }, function(err, response, body) {
       body = JSON.parse(body);
-      var url1 = body.results[0].url;
-      var url2 = body.results[1].url;
-      var url3 = body.results[2].url;
-      console.log(url1);
-      console.log(url2);
-      console.log(url3);
-      request.get(mcqURL + "?url=" + url1 + '&limit=1').pipe(fs.createWriteStream('article1.json'));
-      request.get(mcqURL + "?url=" + url2 + '&limit=1').pipe(fs.createWriteStream('article2.json'));
-      request.get(mcqURL + "?url=" + url3 + '&limit=1').pipe(fs.createWriteStream('article3.json'));
+      for(var i=0; i < articleCount; i++) {
+          apiURL = mcqURL + "?url=" + body.results[i].url + '&limit=1';
+          console.log(apiURL);
+          request.get(apiURL).pipe(fs.createWriteStream('article' + i + '.json'));
+          console.log('article' + i + '.json');
+      }
   });
 });
 
@@ -138,7 +136,7 @@ function postTriviaIntroduction(bot, message, callback) {
 
 // ask the trivia question with the choices
 function addTrivia(bot, message, callback) {
-    var obj = JSON.parse(fs.readFileSync('article1.json'));
+    var obj = JSON.parse(fs.readFileSync('article0.json'));
     q = obj.questions;
     console.log(q);
     question = q[0].question;
