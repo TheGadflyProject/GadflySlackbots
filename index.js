@@ -140,11 +140,15 @@ function postTriviaIntroduction(bot, message, callback) {
 function addTrivia(bot, message, callback) {
     var obj = JSON.parse(fs.readFileSync('article1.json'));
     q = obj.questions;
-    question = q.question;
-    choices = q.answer_choices;
+    console.log(q);
+    question = q[0].question;
+    choices = q[0].answer_choices;
     currentChannel = message.channel;
+    console.log(question);
+    console.log(choices);
+    console.log(currentChannel);
     bot.reply(message,
-        q.question + '\n\n' + ':one:\t' + choices[0] + '\n' + ':two:\t' + choices[1] + '\n' + ':three:\t' + choices[2] + '\n' + ':four:\t' + choices[3]);
+        question + '\n\n' + ':one:\t' + choices[0] + '\n' + ':two:\t' + choices[1] + '\n' + ':three:\t' + choices[2] + '\n' + ':four:\t' + choices[3]);
     callback(null);
 }
 

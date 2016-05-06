@@ -1,0 +1,15 @@
+{
+  "num_questions": 1,
+  "questions": [
+    {
+      "answer": "Oreos",
+      "answer_choices": [
+        "the United States",
+        "Oreos",
+        "Finland"
+      ],
+      "question": "Rats develop binge eating after several weeks consisting of five days of food restriction followed by two days of free access to ___________ .",
+      "source_sentence": "Rats develop binge eating after several weeks consisting of five days of food restriction followed by two days of free access to Oreos. "
+    }
+  ]
+}
