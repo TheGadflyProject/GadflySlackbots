@@ -1,0 +1,110 @@
+{
+  "num_questions": 10,
+  "questions": [
+    {
+      "answer": "The Biggest Loser",
+      "answer_choices": [
+        "Season 8 of",
+        "The Biggest Loser"
+      ],
+      "question": "So they were not surprised to see that \" ___________ \" contestants had slow metabolisms when the show ended.",
+      "source_sentence": "So they were not surprised to see that \"The Biggest Loser\" contestants had slow metabolisms when the show ended. "
+    },
+    {
+      "answer": "Erinn Egbert",
+      "answer_choices": [
+        "Erinn Egbert",
+        "Leptin",
+        "Jay Leno",
+        "Joseph Proietto"
+      ],
+      "question": "While many of the contestants kept enough weight off to improve their health and became more physically active, the low weights they strived to keep eluded all but one of them: ___________ , a full-time caregiver for her mother in Versailles, Ky.",
+      "source_sentence": "While many of the contestants kept enough weight off to improve their health and became more physically active, the low weights they strived to keep eluded all but one of them: Erinn Egbert, a full-time caregiver for her mother in Versailles, Ky. "
+    },
+    {
+      "answer": "Season 8",
+      "answer_choices": [
+        "N.I.H.",
+        "NBC",
+        "Season 8",
+        "the National Institutes of Health"
+      ],
+      "question": "A study of ___________ 's contestants has yielded surprising new discoveries about the physiology of obesity that help explain why so many people struggle unsuccessfully to keep off the weight they lose.",
+      "source_sentence": "A study of Season 8's contestants has yielded surprising new discoveries about the physiology of obesity that help explain why so many people struggle unsuccessfully to keep off the weight they lose. "
+    },
+    {
+      "answer": "Kevin Hall",
+      "answer_choices": [
+        "Erinn Egbert",
+        "Leptin",
+        "Kevin Hall",
+        "Joseph Proietto"
+      ],
+      "question": " ___________ , a scientist at a federal research center who admits to a weakness for reality TV, had the idea to follow the \"Biggest Loser\" contestants for six years after that victorious night.",
+      "source_sentence": "Kevin Hall, a scientist at a federal research center who admits to a weakness for reality TV, had the idea to follow the \"Biggest Loser\" contestants for six years after that victorious night. "
+    },
+    {
+      "answer": "Michael Rosenbaum",
+      "answer_choices": [
+        "Erinn Egbert",
+        "Leptin",
+        "Michael Rosenbaum",
+        "Joseph Proietto"
+      ],
+      "question": "Dr. ___________ , an obesity researcher at Columbia University who has collaborated with Dr. Hall in previous studies, said the body's systems for regulating how many calories are consumed and how many are burned are tightly coupled when people are not strenuously trying to lose weight or to maintain a significant weight loss.",
+      "source_sentence": "Dr. Michael Rosenbaum, an obesity researcher at Columbia University who has collaborated with Dr. Hall in previous studies, said the body's systems for regulating how many calories are consumed and how many are burned are tightly coupled when people are not strenuously trying to lose weight or to maintain a significant weight loss. "
+    },
+    {
+      "answer": "Hall",
+      "answer_choices": [
+        "Erinn Egbert",
+        "Leptin",
+        "Hall",
+        "Joseph Proietto"
+      ],
+      "question": "\"It is frightening and amazing,\" said Dr. ___________ , an expert on metabolism at the National Institute of Diabetes and Digestive and Kidney Diseases , which is part of the National Institutes of Health .",
+      "source_sentence": "\"It is frightening and amazing,\" said Dr. Hall, an expert on metabolism at the National Institute of Diabetes and Digestive and Kidney Diseases , which is part of the National Institutes of Health . "
+    },
+    {
+      "answer": "Proietto",
+      "answer_choices": [
+        "Erinn Egbert",
+        "Leptin",
+        "Proietto",
+        "Jay Leno"
+      ],
+      "question": "Dr. ___________ and his colleagues looked at leptin and four other hormones that satiate people.",
+      "source_sentence": "Dr. Proietto and his colleagues looked at leptin and four other hormones that satiate people. "
+    },
+    {
+      "answer": "Cahill",
+      "answer_choices": [
+        "Cahill",
+        "Leptin",
+        "Jackson",
+        "Huizenga"
+      ],
+      "question": "Sequestered on the \"Biggest Loser\" ranch with the other contestants, Mr. ___________ exercised seven hours a day, burning 8,000 to 9,000 calories according to a calorie tracker the show gave him.",
+      "source_sentence": "Sequestered on the \"Biggest Loser\" ranch with the other contestants, Mr. Cahill exercised seven hours a day, burning 8,000 to 9,000 calories according to a calorie tracker the show gave him. "
+    },
+    {
+      "answer": "Danny Cahill",
+      "answer_choices": [
+        "Erinn Egbert",
+        "Leptin",
+        "Danny Cahill",
+        "Joseph Proietto"
+      ],
+      "question": " ___________ stood, slightly dazed, in a blizzard of confetti as the audience screamed and his family ran on stage.",
+      "source_sentence": "Danny Cahill stood, slightly dazed, in a blizzard of confetti as the audience screamed and his family ran on stage. "
+    },
+    {
+      "answer": "American",
+      "answer_choices": [
+        "American"
+      ],
+      "question": "The struggles the contestants went through help explain why it has been so hard to make headway against the nation's obesity problem, which afflicts more than a third of ___________ adults .",
+      "source_sentence": "The struggles the contestants went through help explain why it has been so hard to make headway against the nation's obesity problem, which afflicts more than a third of American adults . "
+    }
+  ]
+}

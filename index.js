@@ -1,13 +1,14 @@
 /**
  *
  */
-var gapFillURL = "https://gadfly-api.herokuapp.com/gadfly/api/gap_fill_questions";
-var mcqURL = "https://gadfly-api.herokuapp.com/gadfly/api/multiple_choice_questions";
+var gapFillURL = "https://api.gadflyproject.com/api/gap_fill_questions";
+var mcqURL = "https://gadfly-api.herokuapp.com/api/multiple_choice_questions";
 var fs = require('fs');
 var d = require('domain').create();
 var async = require('async');
 var schedule = require('node-schedule');
 var request = require("request");
+
 
 
 replies = {
@@ -93,7 +94,6 @@ rule.dayOfWeek = [0, new schedule.Range(1, 6)];
 
 
 var j = schedule.scheduleJob(rule, function(){
-    var url1, url2, url3;
     request.get({
       url: "https://api.nytimes.com/svc/mostpopular/v2/mostemailed/all-sections/1.json",
       qs: {
@@ -101,11 +101,18 @@ var j = schedule.scheduleJob(rule, function(){
       },
     }, function(err, response, body) {
       body = JSON.parse(body);
-      url1 = body.results[0].url;
-      url2 = body.results[1].url;
-      url3 = body.results[2].url;
-    })
+      var url1 = body.results[0].url;
+      var url2 = body.results[1].url;
+      var url3 = body.results[2].url;
+      console.log(url1);
+      console.log(url2);
+      console.log(url3);
+      request.get(mcqURL + "?url=" + url1 + '&limit=1').pipe(fs.createWriteStream('article1.json'));
+      request.get(mcqURL + "?url=" + url2 + '&limit=1').pipe(fs.createWriteStream('article2.json'));
+      request.get(mcqURL + "?url=" + url3 + '&limit=1').pipe(fs.createWriteStream('article3.json'));
+  });
 });
+
 
 
 /*
@@ -131,7 +138,7 @@ function postTriviaIntroduction(bot, message, callback) {
 
 // ask the trivia question with the choices
 function addTrivia(bot, message, callback) {
-    var obj = JSON.parse(fs.readFileSync('twitter.json'));
+    var obj = JSON.parse(fs.readFileSync('article1.json'));
     q = obj.questions;
     question = q.question;
     choices = q.answer_choices;
