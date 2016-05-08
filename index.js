@@ -153,13 +153,12 @@ function callGadflyGapFill (url, convo, bot) {
     d.run(function() {
         request(apiURL, function(e, r, b) {
         if (e) { console.log(e); callback(true); return; }
-        console.log(b)
         obj = JSON.parse(b)
-        console.log(obj)
         questions = obj['questions']
         index = getRandomInt(obj['num_questions'])
         q = questions[index]
         convo.next();
+        max_attempt = 0;
         convo.ask(q.question_text, [
         {
             pattern: q.correct_answer,
@@ -200,6 +199,7 @@ function callGadflyGapFill (url, convo, bot) {
         {
             default: true,
             callback: function(response, convo) {
+                max_attempt++;
                 msg = {}
                 currentChannel = convo.source_message.channel;
                 convo.say('Whoops! That is incorrect. :frowning:');
@@ -212,8 +212,13 @@ function callGadflyGapFill (url, convo, bot) {
                 if (currentChannel[0] == 'C') {
                     botIsInAChannel(bot, currentChannel);
                 }
-                convo.repeat();
-                convo.next();
+                if (max_attempt < 3) {
+                    convo.repeat();
+                    convo.next();
+                } else {
+                    convo.say('That\'s okay! If you want, you can read the article here' + ' ' + url);
+                    convo.next();
+                }
             }
         }
         ]);
