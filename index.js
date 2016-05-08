@@ -9,6 +9,7 @@ var d = require('domain').create();
 var async = require('async');
 var schedule = require('node-schedule');
 var request = require("request");
+var RateLimiter = require('limiter').RaterLimiter;
 
 
 
@@ -102,11 +103,16 @@ var j = schedule.scheduleJob(rule, function(){
       },
     }, function(err, response, body) {
       body = JSON.parse(body);
+      var limiter = new RateLimiter(3, 'minute');
       for(var i=0; i < articleCount; i++) {
           apiURL = mcqURL + "?url=" + body.results[i].url + '&limit=1';
           console.log(apiURL);
-          request.get(apiURL).pipe(fs.createWriteStream('article' + i + '.json'));
-          console.log('article' + i + '.json');
+          request
+            .get(apiURL)
+            .on('error', function(err) {
+                console.log(err)
+            })
+            .pipe(fs.createWriteStream('article' + i + '.json'));
       }
   });
 });

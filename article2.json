@@ -1,9 +1,14 @@
-<html>
-  <head>
-    <title>Internal Server Error</title>
-  </head>
-  <body>
-    <h1><p>Internal Server Error</p></h1>
-    
-  </body>
-</html>
+{
+  "num_questions": 1,
+  "questions": [
+    {
+      "answer": "The Biggest Loser",
+      "answer_choices": [
+        "The Biggest Loser",
+        "Season 8 of"
+      ],
+      "question": "So they were not surprised to see that \" ___________ \" contestants had slow metabolisms when the show ended.",
+      "source_sentence": "So they were not surprised to see that \"The Biggest Loser\" contestants had slow metabolisms when the show ended. "
+    }
+  ]
+}
