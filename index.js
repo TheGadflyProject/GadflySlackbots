@@ -170,12 +170,12 @@ replies = {
 // introduce yourself to the trivia crowd!
 function postTriviaIntro(bot, message, callback) {
     var intro = 'Hi everyone <!here>, it\'s time to play some trivia!' + 
-                'I\'ve picked some popular articles for today\'s newspaper ' +
-                'and will ask you some questions on them. \n\n' +
+                'I\'ve picked some popular articles from today\'s newspaper ' +
+                'and will ask you some questions. \n\n' +
                 '* You have 30 seconds to respond to each question.\n' +
                 '* You can answer the question using the associated reactions.\n' +
                 '* You will get extra points for answering before others :simple_smile:\n' +
-                '* Top scorers will automatically be posted at the end.\n';
+                '* Scores will automatically posted at the end.\n';
     bot.reply(message, intro);
     callback(null);
 }
@@ -183,13 +183,13 @@ function postTriviaIntro(bot, message, callback) {
 // Say thanks and that you will post answers soon!
 function postTriviaOutro(bot, message, callback) {
     var msg = 'Thanks everyone for playing! I am using a dusty papyrus ' + 
-              'and watery ink to count your scores. So, sit tight while I finish up!';
+              'and watery ink to count your scores. So, it might take a ' + 
+              'little while for me to finish up!';
     bot.reply(message, msg);
     callback(null);
 }
 
 function getTriviaQuestions(callback) {
-    console.log("getTriviaQuestions");
     request.get({
       url: "https://api.nytimes.com/svc/mostpopular/v2/mostemailed/all-sections/1.json",
       qs: {
@@ -210,12 +210,10 @@ function getTriviaQuestions(callback) {
         }
     );
     callback(null);
-    console.log("getTriviaQuestions", "completed");
 }
 
 // ask the trivia question with the choices
 function postTrivia(bot, filename, message, callback) {
-    console.log("postTrivia");
     var obj = JSON.parse(fs.readFileSync(filename));
     q = obj.questions[0];
     question = q.question;
