@@ -118,15 +118,13 @@ controller.hears(['stop', 'Stop', 'STOP', 'stahp', 'STAHP'],
 /*
  * Core bot logic
  */
-controller.hears('start trivia now', ['ambient'], function(bot, message) {
+controller.hears('start trivia now', ['ambient', 'direct_message'], function(bot, message) {
     async.series([
         function(callback) {postTriviaIntro(bot, message, callback);},
         function(callback) {getTriviaQuestions(callback);},
         function(callback) {waitNSecs(10, callback);},
-        function(callback) {bot.reply(message, "ready?!"); callback(null);},
-        function(callback) {waitNSecs(5, callback);},
         function(callback) {bot.reply(message, "Let's go!"); callback(null);},
-        function(callback) {bot.reply(message, "Here is the first question!"); callback(null);},
+        function(callback) {bot.reply(message, "Question number 1!"); callback(null);},
         
         // Article 1
         function(callback) {waitNSecs(5, callback);},
@@ -136,7 +134,7 @@ controller.hears('start trivia now', ['ambient'], function(bot, message) {
         function(callback) {waitNSecs(20, callback);},
         
         // Article 2
-        function(callback) {bot.reply(message, "Okay, time for the next question!"); callback(null);},
+        function(callback) {bot.reply(message, "Next question!"); callback(null);},
         function(callback) {waitNSecs(5, callback);},
         function(callback) {postTrivia(bot, './trivia/article1.json', message, callback);},
         function(callback) {waitNSecs(1, callback);},
@@ -144,7 +142,7 @@ controller.hears('start trivia now', ['ambient'], function(bot, message) {
         function(callback) {waitNSecs(20, callback);},
       
         // Article 3        
-        function(callback) {bot.reply(message, "Okay, time for the last question!");  callback(null);},
+        function(callback) {bot.reply(message, "Time for the last question!");  callback(null);},
         function(callback) {waitNSecs(5, callback);},
         function(callback) {postTrivia(bot, './trivia/article2.json', message, callback);},
         function(callback) {waitNSecs(1, callback);},
@@ -180,12 +178,11 @@ replies = {
 // introduce yourself to the trivia crowd!
 function postTriviaIntro(bot, message, callback) {
     var intro = 'Hi everyone <!here>, it\'s time to play some trivia!' + 
-                'I\'ve picked some popular articles from today\'s newspaper ' +
-                'and will ask you some questions. \n\n' +
-                '* You have 30 seconds to respond to each question.\n' +
-                '* You can answer the question using the associated reactions.\n' +
-                '* You will get extra points for answering before others :simple_smile:\n' +
-                '* Scores will automatically posted at the end.\n';
+                'I\'ve picked some of today\'s popular articles and will ask you 3 questions. \n\n' +
+                '* Click on the reactions to answer. You have 30 seconds for each question.\n' +
+                '* 1 point for answering correctly :nerd_face: \n' + 
+                '* 1 bonus point for answering first :zap:\n' +
+                '* Scores will be posted automatically at the end.\n';
     bot.reply(message, intro);
     callback(null);
 }
@@ -199,7 +196,7 @@ function postTriviaOutro(bot, message, callback) {
 
 function getTriviaQuestions(callback) {
     request.get({
-      url: "https://api.nytimes.com/svc/mostpopular/v2/mostemailed/all-sections/1.json",
+      url: "https://api.nytimes.com/svc/mostpopular/v2/mostviewed/all-sections/1.json",
       qs: {
         'api-key': "f5216a41176d45d5ab8904d74eb88d21"
       },
@@ -314,7 +311,7 @@ function calculateScores(bot, message, callback) {
     // Save score to json
     jsonfile.writeFileSync('trivia_answers.json', trivia_answers, {'flag': 'w'});
     var currentChannel = message.channel; 
-    bot.reply(message, "*Here are the final scores!*");
+    bot.reply(message, "*Here are the final scores!* :trophy:");
     
     var scores = [];
     var last_answer;
@@ -327,12 +324,10 @@ function calculateScores(bot, message, callback) {
         // Bonus Points for first to answer
         if (last_answer == undefined || last_answer != trivia_answers[i].item.ts) {
             scores[trivia_answers[i].user] = scores[trivia_answers[i].user] + 1;
-            bot.reply(message, "The first to answer was: " + trivia_answers[i].user);
         }
         last_answer = trivia_answers[i].item.ts;
     }
     
-    bot.reply(message, "The scores are:\n");
     for(var i=0; i < trivia_keys.length; i++) {
         bot.reply(message, (i + 1) + ")\t" + trivia_keys[i].replace(":", "").replace(":", ""));
     }
@@ -347,8 +342,7 @@ function calculateScores(bot, message, callback) {
             }
         );
     }
-    
-    // bot.reply(message, score_message);
+
     callback(null);
 }
 
