@@ -124,7 +124,7 @@ controller.hears('start trivia now', ['ambient'], function(bot, message) {
         function(callback) {postTrivia(bot, './trivia/article0.json', message, callback);},
         function(callback) {waitNSecs(1, callback);},
         function(callback) {addReactions(bot, message, callback);},
-        function(callback) {waitNSecs(60, callback);},
+        function(callback) {waitNSecs(45, callback);},
         
         // Article 2
         function(callback) {bot.reply(message, "Okay, time for the next question!"); callback(null);},
@@ -132,7 +132,7 @@ controller.hears('start trivia now', ['ambient'], function(bot, message) {
         function(callback) {postTrivia(bot, './trivia/article1.json', message, callback);},
         function(callback) {waitNSecs(1, callback);},
         function(callback) {addReactions(bot, message, callback);},
-        function(callback) {waitNSecs(60, callback);},
+        function(callback) {waitNSecs(45, callback);},
       
         // Article 3        
         function(callback) {bot.reply(message, "Okay, time for the last question!");  callback(null);},
@@ -140,7 +140,7 @@ controller.hears('start trivia now', ['ambient'], function(bot, message) {
         function(callback) {postTrivia(bot, './trivia/article2.json', message, callback);},
         function(callback) {waitNSecs(1, callback);},
         function(callback) {addReactions(bot, message, callback);},
-        function(callback) {waitNSecs(60, callback);},
+        function(callback) {waitNSecs(45, callback);},
         
         // Calculate Score Here
         function(callback) {calculateScores(callback);},
