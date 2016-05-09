@@ -332,7 +332,7 @@ function calculateScores(bot, message, callback) {
         last_answer = trivia_answers[i].item.ts;
     }
     
-    bot.reply(message, "The answers are:\n");
+    bot.reply(message, "The scores are:\n");
     for(var i=0; i < trivia_keys.length; i++) {
         bot.reply(message, (i + 1) + ")\t" + trivia_keys[i].replace(":", "").replace(":", ""));
     }
