@@ -32,3 +32,4 @@ node_modules
 trivia/
 reactions.json
 session.storage
+run_bot.sh
