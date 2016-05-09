@@ -13,6 +13,13 @@ var schedule = require('node-schedule');
 var request = require('request');
 
 var trivia_answers = [];
+var trivia_keys = [];
+var choiceReactions = {
+    0: ':one:',
+    1: ':two:',
+    2: ':three:',
+    3: ':four:',
+}
 
 replies = {
     idk: new RegExp(/^(idk|not sure|i don\'t know|don\'t know')/i),
@@ -126,7 +133,7 @@ controller.hears('start trivia now', ['ambient'], function(bot, message) {
         function(callback) {postTrivia(bot, './trivia/article0.json', message, callback);},
         function(callback) {waitNSecs(1, callback);},
         function(callback) {addReactions(bot, message, callback);},
-        function(callback) {waitNSecs(4, callback);},
+        function(callback) {waitNSecs(20, callback);},
         
         // Article 2
         function(callback) {bot.reply(message, "Okay, time for the next question!"); callback(null);},
@@ -134,7 +141,7 @@ controller.hears('start trivia now', ['ambient'], function(bot, message) {
         function(callback) {postTrivia(bot, './trivia/article1.json', message, callback);},
         function(callback) {waitNSecs(1, callback);},
         function(callback) {addReactions(bot, message, callback);},
-        function(callback) {waitNSecs(4, callback);},
+        function(callback) {waitNSecs(20, callback);},
       
         // Article 3        
         function(callback) {bot.reply(message, "Okay, time for the last question!");  callback(null);},
@@ -142,10 +149,10 @@ controller.hears('start trivia now', ['ambient'], function(bot, message) {
         function(callback) {postTrivia(bot, './trivia/article2.json', message, callback);},
         function(callback) {waitNSecs(1, callback);},
         function(callback) {addReactions(bot, message, callback);},
-        function(callback) {waitNSecs(4, callback);},
+        function(callback) {waitNSecs(20, callback);},
         
         // Calculate Score Here
-        function(callback) {calculateScores(callback);},
+        function(callback) {calculateScores(bot, message, callback);},
         function(callback) {waitNSecs(10, callback);},
         function(callback) {postTriviaOutro(bot, message, callback);},
     ]);
@@ -155,11 +162,11 @@ controller.hears('start trivia now', ['ambient'], function(bot, message) {
 controller.on('reaction_added', function(bot, message) {
     // session.storage is the file that stores the id of the message that we care about
     var targetMsg = fs.readFileSync('session.storage');
-    if (message.user != bot.identity.id && message.item.ts == targetMsg) {
+    var correct_answer = trivia_keys[message.item.ts].replace(":", "").replace(":", "");
+    if (message.user != bot.identity.id &&
+        message.item.ts == targetMsg &&
+        message.reaction == correct_answer) {
         trivia_answers.push(message);
-        // fs.appendFile('reactions.json', JSON.stringify(message) + ',', function(err) {
-        //     if (err) console.log(err);
-        // });
     }
 });
 
@@ -185,9 +192,7 @@ function postTriviaIntro(bot, message, callback) {
 
 // Say thanks and that you will post answers soon!
 function postTriviaOutro(bot, message, callback) {
-    var msg = 'Thanks everyone for playing! I am using a dusty papyrus ' + 
-              'and watery ink to count your scores. So, it might take a ' + 
-              'little while for me to finish up!';
+    var msg = 'Thanks everyone for playing!';
     bot.reply(message, msg);
     callback(null);
 }
@@ -222,18 +227,39 @@ function postTrivia(bot, filename, message, callback) {
     question = q.question;
     currentChannel = message.channel;
     choices = constructAnswerChoices(q.answer_choices);
+    answer_idx = answerIdx(q.answer_choices, q.answer);
+    answer_reaction = choiceReactions[answer_idx];
+    saveAnswer(bot, message, answer_reaction);
     bot.reply(message, q.question + '\n\n' + choices);
     callback(null);
 }
 
-function constructAnswerChoices(answer_choices) {
-    var choiceReactions = {
-        0: ':one:',
-        1: ':two:',
-        2: ':three:',
-        3: ':four:',
+function answerIdx(answer_choices, answer) {
+    for(var i=0; i < answer_choices.length; i++) {
+        if(answer_choices[i] == answer) {
+            return i;
+        }
     }
+    return -1;
+}
+
+function saveAnswer(bot, message, correct_answer, callback) {
+    var currentChannel = message.channel;
     
+    bot.api.channels.history({
+        channel: currentChannel,
+        count: 1,
+        inclusive: 1
+    }, function(err, body) {
+            if (err) {
+                console.log(err);
+            }
+            msg_id = body.messages[0].ts;
+            trivia_keys[msg_id] = correct_answer;
+    });
+}
+
+function constructAnswerChoices(answer_choices) {
     var choices = "";
     for(var i=0; i < answer_choices.length; i++) {
         choices = choices + choiceReactions[i] + '\t' + answer_choices[i] + '\n';
@@ -284,10 +310,33 @@ function addReactions(bot, message, callback) {
 }
 
 // Calcualte Scores for trivia
-function calculateScores(callback) {
-    // console.log("Will be calculating scores here.");
+function calculateScores(bot, message, callback) {
     // Save score to json
-    jsonfile.writeFileSync('trivia_answers.json', trivia_answers, {'flag': 'a'});
+    jsonfile.writeFileSync('trivia_answers.json', trivia_answers, {'flag': 'w'});
+    var currentChannel = message.channel; 
+    bot.reply(message, "*Here are the final scores!*");
+    
+    var scores = [];
+    for(var i=0; i < trivia_answers.length; i++) {
+        if(trivia_answers[i].user in scores) {
+            scores[trivia_answers[i].user] = scores[trivia_answers[i].user] + 1;
+        } else {
+            scores[trivia_answers[i].user] = 1;
+        }
+    }
+    
+    // Get User Names
+    for(var u in scores) {
+        bot.api.users.info(
+            {user: u},
+            function(err, res) {
+                score_message = res.user.name + " : " + scores[u] + "\n";
+                bot.reply(message, score_message);
+            }
+        );
+    }
+    
+    // bot.reply(message, score_message);
     callback(null);
 }
 
