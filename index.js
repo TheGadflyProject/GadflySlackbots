@@ -12,6 +12,8 @@ var articleCount=3;
 var schedule = require('node-schedule');
 var request = require('request');
 
+var trivia_answers = [];
+
 replies = {
     idk: new RegExp(/^(idk|not sure|i don\'t know|don\'t know')/i),
     stop: new RegExp(/^(stop|Stop|STOP)/i),
@@ -116,7 +118,7 @@ controller.hears('start trivia now', ['ambient'], function(bot, message) {
         function(callback) {waitNSecs(10, callback);},
         function(callback) {bot.reply(message, "ready?!"); callback(null);},
         function(callback) {waitNSecs(5, callback);},
-        function(callback) {bot.reply(message, "Let's Go!"); callback(null);},
+        function(callback) {bot.reply(message, "Let's go!"); callback(null);},
         function(callback) {bot.reply(message, "Here is the first question!"); callback(null);},
         
         // Article 1
@@ -124,7 +126,7 @@ controller.hears('start trivia now', ['ambient'], function(bot, message) {
         function(callback) {postTrivia(bot, './trivia/article0.json', message, callback);},
         function(callback) {waitNSecs(1, callback);},
         function(callback) {addReactions(bot, message, callback);},
-        function(callback) {waitNSecs(45, callback);},
+        function(callback) {waitNSecs(4, callback);},
         
         // Article 2
         function(callback) {bot.reply(message, "Okay, time for the next question!"); callback(null);},
@@ -132,7 +134,7 @@ controller.hears('start trivia now', ['ambient'], function(bot, message) {
         function(callback) {postTrivia(bot, './trivia/article1.json', message, callback);},
         function(callback) {waitNSecs(1, callback);},
         function(callback) {addReactions(bot, message, callback);},
-        function(callback) {waitNSecs(45, callback);},
+        function(callback) {waitNSecs(4, callback);},
       
         // Article 3        
         function(callback) {bot.reply(message, "Okay, time for the last question!");  callback(null);},
@@ -140,7 +142,7 @@ controller.hears('start trivia now', ['ambient'], function(bot, message) {
         function(callback) {postTrivia(bot, './trivia/article2.json', message, callback);},
         function(callback) {waitNSecs(1, callback);},
         function(callback) {addReactions(bot, message, callback);},
-        function(callback) {waitNSecs(45, callback);},
+        function(callback) {waitNSecs(4, callback);},
         
         // Calculate Score Here
         function(callback) {calculateScores(callback);},
@@ -154,9 +156,10 @@ controller.on('reaction_added', function(bot, message) {
     // session.storage is the file that stores the id of the message that we care about
     var targetMsg = fs.readFileSync('session.storage');
     if (message.user != bot.identity.id && message.item.ts == targetMsg) {
-        fs.appendFile('reactions.json', JSON.stringify(message) + ',', function(err) {
-            if (err) console.log(err);
-        });
+        trivia_answers.push(message);
+        // fs.appendFile('reactions.json', JSON.stringify(message) + ',', function(err) {
+        //     if (err) console.log(err);
+        // });
     }
 });
 
@@ -282,7 +285,9 @@ function addReactions(bot, message, callback) {
 
 // Calcualte Scores for trivia
 function calculateScores(callback) {
-    console.log("Will be calculating scores here.");
+    // console.log("Will be calculating scores here.");
+    // Save score to json
+    jsonfile.writeFileSync('trivia_answers.json', trivia_answers, {'flag': 'a'});
     callback(null);
 }
 
