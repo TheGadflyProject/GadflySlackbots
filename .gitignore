@@ -34,3 +34,4 @@ reactions.json
 session.storage
 run_bot.sh
 trivia_answers.json
+trivia_keys.json
