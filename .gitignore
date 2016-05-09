@@ -30,3 +30,5 @@ node_modules
 *.swp
 .env
 trivia/
+reactions.json
+session.storage
