@@ -262,7 +262,7 @@ function saveAnswer(bot, message, correct_answer, callback) {
 function constructAnswerChoices(answer_choices) {
     var choices = "";
     for(var i=0; i < answer_choices.length; i++) {
-        choices = choices + choiceReactions[i] + '\t' + answer_choices[i] + '\n';
+        choices = choices + i+1 + ')\t' + answer_choices[i] + '\n';
     }
 
     return choices;
@@ -317,12 +317,18 @@ function calculateScores(bot, message, callback) {
     bot.reply(message, "*Here are the final scores!*");
     
     var scores = [];
+    var last_answer;
     for(var i=0; i < trivia_answers.length; i++) {
         if(trivia_answers[i].user in scores) {
             scores[trivia_answers[i].user] = scores[trivia_answers[i].user] + 1;
         } else {
             scores[trivia_answers[i].user] = 1;
         }
+        // Bonus Points for first to answer
+        if (last_answer == undefined || last_answer != trivia_answers[i].item.ts) {
+            scores[trivia_answers[i].user] = scores[trivia_answers[i].user] + 1;
+        }
+        last_answer = trivia_answers[i].item.ts;
     }
     
     // Get User Names
