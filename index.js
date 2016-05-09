@@ -1,13 +1,26 @@
 /**
- * Constants and declarations
+ *
  */
-var gapFillURL = "http://api.gadflyproject.com/api/gap_fill_questions"
-var mcqURL = "http://api.gadflyproject.com/api/multiple_choice_questions"
-var fs = require('fs');
 var d = require('domain').create();
-var async = require('async')
+var async = require('async');
+var fs = require('fs');
+var jsonfile = require('jsonfile');
+var file = '/trivia/trivia_answers.json';
+var gapFillURL = "https://gadfly-api.herokuapp.com/api/gap_fill_questions"
+var mcqURL = "https://gadfly-api.herokuapp.com/api/multiple_choice_questions"
+var articleCount=3;
+var schedule = require('node-schedule');
+var request = require('request');
 
-// A pattern library for conversational constructs.
+var trivia_answers = [];
+var trivia_keys = [];
+var choiceReactions = {
+    0: ':one:',
+    1: ':two:',
+    2: ':three:',
+    3: ':four:',
+}
+
 replies = {
     idk: new RegExp(/^(idk|not sure|i don\'t know|don\'t know')/i),
     stop: new RegExp(/^(stop|Stop|STOP)/i),
@@ -81,36 +94,178 @@ controller.on('rtm_close', function(bot) {
     // you may want to attempt to re-open
 });
 
+// much like a vampire, you must invite a bot into your channel
+controller.on('bot_channel_join', function(bot, message) {
+    bot.reply(message, "I'm here!")
+});
+
+// say hello
+controller.hears(['hey', 'hello', 'hi', 'greetings', 'sup', 'yo'], 
+                 ['direct_mention', 'mention', 'direct_message'],
+                 function(bot, message) {
+                    bot.reply(message,
+                              'Hi there! I am TriviaBot, you can start a trivia game by saying' +
+                              '"start trivia now" in this channel.');
+ });
+
+// stop
+controller.hears(['stop', 'Stop', 'STOP', 'stahp', 'STAHP'],
+                 ['direct_message','mention'],
+                 function(bot, message) {
+                    return bot.reply(message, 'I heard you loud and clear boss.');
+});
+
 /*
  * Core bot logic
  */
-controller.hears('trivia', ['ambient'], function(bot, message) {
+controller.hears('start trivia now', ['ambient'], function(bot, message) {
     async.series([
-        function(callback) {postTriviaIntroduction(bot, message, callback);},
-        function(callback) {waitNSecs(3000, callback);},
-        function(callback) {addTrivia(bot, message, callback);},
-        function(callback) {waitNSecs(700, callback);},
-        function(callback) {addReactions(bot, message, callback);}
+        function(callback) {postTriviaIntro(bot, message, callback);},
+        function(callback) {getTriviaQuestions(callback);},
+        function(callback) {waitNSecs(10, callback);},
+        function(callback) {bot.reply(message, "ready?!"); callback(null);},
+        function(callback) {waitNSecs(5, callback);},
+        function(callback) {bot.reply(message, "Let's go!"); callback(null);},
+        function(callback) {bot.reply(message, "Here is the first question!"); callback(null);},
+        
+        // Article 1
+        function(callback) {waitNSecs(5, callback);},
+        function(callback) {postTrivia(bot, './trivia/article0.json', message, callback);},
+        function(callback) {waitNSecs(1, callback);},
+        function(callback) {addReactions(bot, message, callback);},
+        function(callback) {waitNSecs(20, callback);},
+        
+        // Article 2
+        function(callback) {bot.reply(message, "Okay, time for the next question!"); callback(null);},
+        function(callback) {waitNSecs(5, callback);},
+        function(callback) {postTrivia(bot, './trivia/article1.json', message, callback);},
+        function(callback) {waitNSecs(1, callback);},
+        function(callback) {addReactions(bot, message, callback);},
+        function(callback) {waitNSecs(20, callback);},
+      
+        // Article 3        
+        function(callback) {bot.reply(message, "Okay, time for the last question!");  callback(null);},
+        function(callback) {waitNSecs(5, callback);},
+        function(callback) {postTrivia(bot, './trivia/article2.json', message, callback);},
+        function(callback) {waitNSecs(1, callback);},
+        function(callback) {addReactions(bot, message, callback);},
+        function(callback) {waitNSecs(20, callback);},
+        
+        // Calculate Score Here
+        function(callback) {calculateScores(bot, message, callback);},
+        function(callback) {waitNSecs(10, callback);},
+        function(callback) {postTriviaOutro(bot, message, callback);},
     ]);
 });
 
+// monitor last question for answers
+controller.on('reaction_added', function(bot, message) {
+    // session.storage is the file that stores the id of the message that we care about
+    var targetMsg = fs.readFileSync('session.storage');
+    var correct_answer = trivia_keys[message.item.ts].replace(":", "").replace(":", "");
+    if (message.user != bot.identity.id &&
+        message.item.ts == targetMsg &&
+        message.reaction == correct_answer) {
+        trivia_answers.push(message);
+    }
+});
+
+// Trivia
+replies = {
+    idk: new RegExp(/^(idk|not sure|i don\'t know|don\'t know')/i),
+    stop: new RegExp(/^(stop|Stop|STOP)/i),
+};
+
+
 // introduce yourself to the trivia crowd!
-function postTriviaIntroduction(bot, message, callback) {
-    var intro = 'Hi everyone <!here>, it\'s time to play some trivia! I\'ve picked a popular article for the day and will ask a question based off of it. You have an hour to respond, but I will be giving extra points for those first to answer :simple_smile:';
+function postTriviaIntro(bot, message, callback) {
+    var intro = 'Hi everyone <!here>, it\'s time to play some trivia!' + 
+                'I\'ve picked some popular articles from today\'s newspaper ' +
+                'and will ask you some questions. \n\n' +
+                '* You have 30 seconds to respond to each question.\n' +
+                '* You can answer the question using the associated reactions.\n' +
+                '* You will get extra points for answering before others :simple_smile:\n' +
+                '* Scores will automatically posted at the end.\n';
     bot.reply(message, intro);
     callback(null);
 }
 
-// ask the trivia question with the choices
-function addTrivia(bot, message, callback) {
-    var obj = JSON.parse(fs.readFileSync('twitter.json'));
-    q = obj.questions;
-    question = q.question;
-    choices = q.answer_choices;
-    currentChannel = message.channel;
-    bot.reply(message,
-        q.question + '\n\n' + ':one:\t' + choices[0] + '\n' + ':two:\t' + choices[1] + '\n' + ':three:\t' + choices[2] + '\n' + ':four:\t' + choices[3]);
+// Say thanks and that you will post answers soon!
+function postTriviaOutro(bot, message, callback) {
+    var msg = 'Thanks everyone for playing!';
+    bot.reply(message, msg);
     callback(null);
+}
+
+function getTriviaQuestions(callback) {
+    request.get({
+      url: "https://api.nytimes.com/svc/mostpopular/v2/mostemailed/all-sections/1.json",
+      qs: {
+        'api-key': "f5216a41176d45d5ab8904d74eb88d21"
+      },
+    }, function(err, response, body) {
+        body = JSON.parse(body);
+        
+        for(var i=0; i < articleCount; i++) {
+            var filename = './trivia/article' + i + '.json';
+            apiURL = mcqURL + "?url=" + body.results[i].url + '&limit=1';
+            r = request.get(apiURL)
+                .on('error', function(err) {
+                    console.log(err)
+                })
+                .pipe(fs.createWriteStream('./trivia/article' + i + '.json'));
+            }
+        }
+    );
+    callback(null);
+}
+
+// ask the trivia question with the choices
+function postTrivia(bot, filename, message, callback) {
+    var obj = JSON.parse(fs.readFileSync(filename));
+    q = obj.questions[0];
+    question = q.question;
+    currentChannel = message.channel;
+    choices = constructAnswerChoices(q.answer_choices);
+    answer_idx = answerIdx(q.answer_choices, q.answer);
+    answer_reaction = choiceReactions[answer_idx];
+    saveAnswer(bot, message, answer_reaction);
+    bot.reply(message, q.question + '\n\n' + choices);
+    callback(null);
+}
+
+function answerIdx(answer_choices, answer) {
+    for(var i=0; i < answer_choices.length; i++) {
+        if(answer_choices[i] == answer) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+function saveAnswer(bot, message, correct_answer, callback) {
+    var currentChannel = message.channel;
+    
+    bot.api.channels.history({
+        channel: currentChannel,
+        count: 1,
+        inclusive: 1
+    }, function(err, body) {
+            if (err) {
+                console.log(err);
+            }
+            msg_id = body.messages[0].ts;
+            trivia_keys[msg_id] = correct_answer;
+    });
+}
+
+function constructAnswerChoices(answer_choices) {
+    var choices = "";
+    for(var i=0; i < answer_choices.length; i++) {
+        choices = choices + i+1 + ')\t' + answer_choices[i] + '\n';
+    }
+
+    return choices;
 }
 
 // use the slack api to locate the last message in the channel we are in right now 
@@ -154,55 +309,74 @@ function addReactions(bot, message, callback) {
     callback(null);
 }
 
+// Calcualte Scores for trivia
+function calculateScores(bot, message, callback) {
+    // Save score to json
+    jsonfile.writeFileSync('trivia_answers.json', trivia_answers, {'flag': 'w'});
+    var currentChannel = message.channel; 
+    bot.reply(message, "*Here are the final scores!*");
+    
+    var scores = [];
+    var last_answer;
+    for(var i=0; i < trivia_answers.length; i++) {
+        if(trivia_answers[i].user in scores) {
+            scores[trivia_answers[i].user] = scores[trivia_answers[i].user] + 1;
+        } else {
+            scores[trivia_answers[i].user] = 1;
+        }
+        // Bonus Points for first to answer
+        if (last_answer == undefined || last_answer != trivia_answers[i].item.ts) {
+            scores[trivia_answers[i].user] = scores[trivia_answers[i].user] + 1;
+        }
+        last_answer = trivia_answers[i].item.ts;
+    }
+    
+    // Get User Names
+    for(var u in scores) {
+        bot.api.users.info(
+            {user: u},
+            function(err, res) {
+                score_message = res.user.name + " : " + scores[u] + "\n";
+                bot.reply(message, score_message);
+            }
+        );
+    }
+    
+    // bot.reply(message, score_message);
+    callback(null);
+}
+
 // utility function that waits n seconds; n passed as a parameter
 function waitNSecs(n, callback) {
+    n = n * 1000;
     setTimeout(function () {
       callback(null);
     }, n);
 }
 
-// much like a vampire, you must invite a bot into your channel
-controller.on('bot_channel_join', function(bot, message) {
-    bot.reply(message, "I'm here!")
-});
-
-// say hello
-controller.hears(['hey', 'hello', 'hi', 'greetings', 'sup', 'yo'], ['direct_mention', 'mention', 'direct_message'], function(bot, message) {
-     bot.reply(message, 'Hi there! I\'m a bot. If you paste a news article URL in this channel, I can start asking you questions about it.');
- });
-
-// stop
-controller.hears(['stop', 'Stop', 'STOP', 'stahp', 'STAHP'],['direct_message','mention'], function(bot, message) {
-    return bot.reply(message, 'I heard you loud and clear boss.');
-});
 
 // for personality
-controller.hears(['who are you', 'are you a bot', 'what are you', 'what\'s your purpose', 'why are you here', 'what do you do'], ['direct_message','mention','direct_mention', 'ambient'], function(bot, message) {
-    bot.api.reactions.add({
-        timestamp: message.ts,
-        channel: message.channel,
-        name: 'robot_face',
-    }, function(err) {
-        if (err) {
-            console.log(err)
-        }
-        bot.reply(message, 'I\'m just a poor bot, I need no sympathy, Because I\'m easy come, easy go.');
-    });
-});
+controller.hears(['who are you','are you a bot', 
+                  'what are you', 'what\'s your purpose',
+                  'why are you here', 'what do you do'], 
+                 ['direct_message','mention','direct_mention', 'ambient'],
+                 function(bot, message) {
+                    bot.api.reactions.add({
+                        timestamp: message.ts,
+                        channel: message.channel,
+                        name: 'robot_face',
+                    }, function(err) {
+                        if (err) {
+                            console.log(err)
+                        }
+                        bot.reply(message, 'I\'m just a poor bot, I need no sympathy, Because I\'m easy come, easy go.');
+                    });
+                });
+
 controller.hears('open the (.*) doors',['direct_message','mention'], function(bot, message) {
   var doorType = message.match[1]; //match[1] is the (.*) group. match[0] is the entire group (open the (.*) doors).
   if (doorType === 'pod bay') {
     return bot.reply(message, 'I\'m sorry, Dave. I\'m afraid I can\'t do that.');
   }
   return bot.reply(message, 'Okay');
-});
-
-// monitor reactions on the last message & log them to a file if they are not from the bot
-controller.on('reaction_added', function(bot, message) {
-    var targetMsg = fs.readFileSync('session.storage');
-    if (message.user != bot.identity.id && message.item.ts == targetMsg) {
-        fs.appendFile('reactions.json', JSON.stringify(message) + ',', function(err) {
-            if (err) console.log(err);
-        });
-    }
 });
