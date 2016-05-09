@@ -262,7 +262,7 @@ function saveAnswer(bot, message, correct_answer, callback) {
 function constructAnswerChoices(answer_choices) {
     var choices = "";
     for(var i=0; i < answer_choices.length; i++) {
-        choices = choices + i+1 + ')\t' + answer_choices[i] + '\n';
+        choices = choices + (i+1) + ')\t' + answer_choices[i] + '\n';
     }
 
     return choices;
@@ -327,16 +327,22 @@ function calculateScores(bot, message, callback) {
         // Bonus Points for first to answer
         if (last_answer == undefined || last_answer != trivia_answers[i].item.ts) {
             scores[trivia_answers[i].user] = scores[trivia_answers[i].user] + 1;
+            bot.reply(message, "The first to answer was: " + trivia_answers[i].user);
         }
         last_answer = trivia_answers[i].item.ts;
     }
     
+    bot.reply(message, "The scores are:\n");
+    for(var i=0; i < trivia_keys.length; i++) {
+        bot.reply(message, (i + 1) + ")\t" + trivia_keys[i].replace(":", "").replace(":", ""));
+    }
+    
     // Get User Names
-    for(var u in scores) {
+    for(u in scores) {
         bot.api.users.info(
             {user: u},
             function(err, res) {
-                score_message = res.user.name + " : " + scores[u] + "\n";
+                score_message = res.user.name + " : " + scores[res.user.id] + "\n";
                 bot.reply(message, score_message);
             }
         );
