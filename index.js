@@ -105,7 +105,7 @@ controller.hears(['http(.*)'], ['ambient', 'direct_mention', 'mention', 'direct_
             pattern: bot.utterances.yes,
             callback: function(response, convo) {
                 convo.say('Cool, you said: ' + response.text);
-                callGadflyGapFill(url, convo, bot)
+                callGadflyMCQ(url, convo, bot)
             }
         },
         {
@@ -126,7 +126,7 @@ controller.hears(['more', 'next', 'bring it on'], ['direct_mention', 'mention', 
             pattern: bot.utterances.yes,
             callback: function(response, convo) {
                 convo.say('Alright!')
-                callGadflyGapFill(url, convo, bot)
+                callGadflyMCQ(url, convo, bot)
             }
         },
         {
@@ -251,11 +251,7 @@ function callGadflyMCQ(url, convo, bot) {
             callback: function(response, convo) {
                 msg = {}
                 currentChannel = convo.source_message.channel;
-                convo.say('That is correct! :100: Say more and mention me to get more questions.');
-                bot.say({
-                    text: 'Click on the :thumbsup: if you liked this question or the :thumbsdown: if you think this question needs improvement.',
-                    channel: currentChannel
-                });
+                bot.say({text:'That is correct! :100: Say more and mention me to get more questions.',channel:currentChannel});
                 if (currentChannel[0] == 'G') {
                     botIsInAGroup(bot, currentChannel);
                 }
@@ -265,6 +261,10 @@ function callGadflyMCQ(url, convo, bot) {
                 if (currentChannel[0] == 'C') {
                     botIsInAChannel(bot, currentChannel);
                 }
+                bot.say({
+                    text: 'Click on the :thumbsup: if you liked this question or the :thumbsdown: if you think this question needs improvement.',
+                    channel: currentChannel
+                });
                 convo.next();
             }
         },
