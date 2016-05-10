@@ -129,6 +129,7 @@ controller.hears(['news me', 'News me', 'News Me'], ['direct_message', 'mention'
         function(callback) {bot.reply(message, "--------------------", callback(null));},
         function(callback) {waitNSecs(4, callback);},
         function(callback) {bot.reply(message, "Have fun newsing!", callback(null));},
+        function(callback) {bot.reply(message, "And remember: If you want to be quizzed on an article, just send me the URL.", callback(null));}
     ]);
 });
 
