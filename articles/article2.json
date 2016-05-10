@@ -1,0 +1,15 @@
+{
+  "num_questions": 1,
+  "questions": [
+    {
+      "answer_choices": [],
+      "bad_question_votes": 0,
+      "correct_answer": "BowlesSimpsonism",
+      "good_question_votes": 0,
+      "id": "890dfae019932ea57d2a06e44fe56eba",
+      "news_article": "c2dcc511b2581a57ac931708e88cc6ec",
+      "question_text": "Indeed, until not long ago the whole Beltway elite seemed to be in the grip of ___________ , with its assertion that debt was the greatest threat facing the nation.",
+      "source_sentence": "Indeed, until not long ago the whole Beltway elite seemed to be in the grip of BowlesSimpsonism, with its assertion that debt was the greatest threat facing the nation. "
+    }
+  ]
+}

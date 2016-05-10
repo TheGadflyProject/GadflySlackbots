@@ -1,0 +1,15 @@
+{
+  "num_questions": 1,
+  "questions": [
+    {
+      "answer_choices": [],
+      "bad_question_votes": 0,
+      "correct_answer": "Cleveland",
+      "good_question_votes": 0,
+      "id": "7e7cba1df40fb6e7d0b0de32811ba6b8",
+      "news_article": "fb40274fa91b3cf4207a519eaf189434",
+      "question_text": " With the assumption that the party's nomination would not be decided on the first convention ballot, Mr. Cruz spent considerable time this spring electing delegates favorable to him to the July convention in ___________ .",
+      "source_sentence": " With the assumption that the party's nomination would not be decided on the first convention ballot, Mr. Cruz spent considerable time this spring electing delegates favorable to him to the July convention in Cleveland. "
+    }
+  ]
+}

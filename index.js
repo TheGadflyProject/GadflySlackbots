@@ -1,12 +1,19 @@
 /**
  * Constants and declarations
  */
+var request = require('request');
+var d = require('domain').create();
+var async = require('async');
+var fs = require('fs');
+var jsonfile = require('jsonfile');
+var schedule = require('node-schedule');
+
+var dir = './articles/article'
 var gapFillURL = "http://api.gadflyproject.com/api/gap_fill_questions"
 var mcqURL = "http://gadfly-api.herokuapp.com/api/multiple_choice_questions"
-var http = require('http');
-var https = require('https');
-var request = require('request');
-var d = require('domain').create()
+var articleCount = 3
+var articleURLs = []
+var newsme = ['*flux capacitating the news*', '*calling the news falcon*', '*summoning the news daemon*', '*get ready to news and chill*', '*frombobulating the thing that gets the news*', '*such news much articles very bot*', '*carpe-ing the diem*', '*rubbing the news lamp thrice*']
 
 // A pattern library to match specific conversational constructs
 replies = {
@@ -90,6 +97,81 @@ controller.on('bot_channel_join', function(bot, message) {
     bot.reply(message, "I'm here!")
 });
 
+// news me
+controller.hears(['news me', 'News me', 'News Me'], ['direct_message', 'mention', 'direct_mention'], function(bot, message) {
+     async.series([
+        function(callback) {bot.reply(message, "Ok," + " " + newsme[getRandomInt(8)], callback(null));},
+        function(callback) {getNYTArticles(callback);},
+        function(callback) {waitNSecs(10, callback);},
+        function(callback) {bot.reply(message, "First!"); callback(null);},
+        
+        // Article 1
+        function(callback) {waitNSecs(5, callback);},
+        function(callback) {postArticle(bot, dir + '0.json', message, callback);},
+        function(callback) {waitNSecs(10, callback);},
+        function(callback) {postArticle(bot, articleURLs[0], message, callback);},
+        
+        // Article 2
+        function(callback) {bot.reply(message, "Next!"); callback(null);},
+        function(callback) {waitNSecs(5, callback);},
+        function(callback) {postArticle(bot, dir + '1.json', message, callback);},
+        function(callback) {waitNSecs(20, callback);},
+        function(callback) {postArticle(bot, articleURLs[1], message, callback);},
+      
+        // Article 3        
+        function(callback) {bot.reply(message, "Finally!");  callback(null);},
+        function(callback) {waitNSecs(5, callback);},
+        function(callback) {postArticle(bot, dir + '2.json', message, callback);},
+        function(callback) {waitNSecs(20, callback);},
+        function(callback) {postArticle(bot, articleURLs[2], message, callback);},
+        
+        // Exit
+        function(callback) {waitNSecs(10, callback);},
+        function(callback) {bot.reply(message, "Have fun newsing!", callback(null));},
+    ]);
+});
+
+// get top 3 articles from the nytimes most popular, most viewed section.
+function getNYTArticles(callback) {
+    request.get({
+      url: "https://api.nytimes.com/svc/mostpopular/v2/mostviewed/all-sections/1.json",
+      qs: {
+        'api-key': "f5216a41176d45d5ab8904d74eb88d21"
+      },
+    }, function(err, response, body) {
+        body = JSON.parse(body);
+        
+        for(var i=0; i < articleCount; i++) {
+            var filename = dir + i + '.json';
+            articleURL = body.results[i].url;
+            articleURLs[i] = articleURL;
+            apiURL = gapFillURL + "?url=" + body.results[i].url + '&limit=1';
+            r = request.get(apiURL)
+                .on('error', function(err) {
+                    console.log(err)
+                })
+                .pipe(fs.createWriteStream(dir + i + '.json'));
+            }
+        }
+    );
+    callback(null);
+}
+
+// ask the question
+function postArticle(bot, filename, message, callback) {
+    var obj = JSON.parse(fs.readFileSync(filename));
+    q = obj.questions[0];
+    question = q.question_text;
+    currentChannel = message.channel;
+    /*choices = "";
+    for(var i=0; i < q.answer_choices.length; i++) {
+        choices = choices + (i+1) + ')\t' + q.answer_choices[i] + '\n';
+    }*/
+    bot.reply(message, question + '\n\n');
+    callback(null);
+}
+
+// when user enters a url
 controller.hears(['http(.*)'], ['ambient', 'direct_mention', 'mention', 'direct_message'], function(bot, message) {
     url = message.text.replace("<", "").replace(">", "")
     bot.startConversation(message, function(err, convo) {
@@ -241,7 +323,7 @@ function callGadflyMCQ(url, convo, bot) {
         if (e) { console.log(e); callback(true); return; }
         obj = JSON.parse(b)
         questions = obj['questions']
-        index = getRandomInt(obj['num_questions'])
+        index = (obj['num_questions'])
         q = questions[index]
         choices = q.answer_choices
         convo.next();
@@ -378,6 +460,14 @@ function botIsInAChannel(bot, currentChannel) {
 // get random integers between 0-12
 function getRandomInt(range) {
     return Math.floor(Math.random() * range);
+}
+
+// utility function that waits n seconds; n passed as a parameter
+function waitNSecs(n, callback) {
+    n = n * 1000;
+    setTimeout(function () {
+      callback(null);
+    }, n);
 }
 
 // stop
