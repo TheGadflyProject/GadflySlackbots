@@ -102,31 +102,31 @@ controller.hears(['news me', 'News me', 'News Me'], ['direct_message', 'mention'
      async.series([
         function(callback) {bot.reply(message, "Ok," + " " + newsme[getRandomInt(8)], callback(null));},
         function(callback) {getNYTArticles(callback);},
-        function(callback) {waitNSecs(10, callback);},
-        function(callback) {bot.reply(message, "First!"); callback(null);},
+        function(callback) {waitNSecs(8, callback);},
         
         // Article 1
-        function(callback) {waitNSecs(5, callback);},
+        function(callback) {bot.reply(message, "--------------------", callback(null));},
+        function(callback) {waitNSecs(2, callback);},
+        function(callback) {bot.reply(message, "First!"); callback(null);},
         function(callback) {postArticle(bot, dir + '0.json', message, callback);},
-        function(callback) {waitNSecs(10, callback);},
-        function(callback) {postArticle(bot, articleURLs[0], message, callback);},
+        function(callback) {bot.reply(message, articleURLs[0], callback(null));},
+        function(callback) {waitNSecs(8, callback);},
         
         // Article 2
         function(callback) {bot.reply(message, "Next!"); callback(null);},
-        function(callback) {waitNSecs(5, callback);},
         function(callback) {postArticle(bot, dir + '1.json', message, callback);},
-        function(callback) {waitNSecs(20, callback);},
-        function(callback) {postArticle(bot, articleURLs[1], message, callback);},
+        function(callback) {bot.reply(message, articleURLs[1], callback(null));},
+        function(callback) {waitNSecs(8, callback);},
       
         // Article 3        
         function(callback) {bot.reply(message, "Finally!");  callback(null);},
-        function(callback) {waitNSecs(5, callback);},
         function(callback) {postArticle(bot, dir + '2.json', message, callback);},
-        function(callback) {waitNSecs(20, callback);},
-        function(callback) {postArticle(bot, articleURLs[2], message, callback);},
+        function(callback) {bot.reply(message, articleURLs[2], callback(null));},
+        function(callback) {waitNSecs(8, callback);},
         
         // Exit
-        function(callback) {waitNSecs(10, callback);},
+        function(callback) {bot.reply(message, "--------------------", callback(null));},
+        function(callback) {waitNSecs(1, callback);},
         function(callback) {bot.reply(message, "Have fun newsing!", callback(null));},
     ]);
 });
@@ -143,8 +143,7 @@ function getNYTArticles(callback) {
         
         for(var i=0; i < articleCount; i++) {
             var filename = dir + i + '.json';
-            articleURL = body.results[i].url;
-            articleURLs[i] = articleURL;
+            articleURLs[i] = body.results[i].url;
             apiURL = gapFillURL + "?url=" + body.results[i].url + '&limit=1';
             r = request.get(apiURL)
                 .on('error', function(err) {
