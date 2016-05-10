@@ -1,17 +1,17 @@
 /**
- *
+ * Constants and declarations.
  */
 var d = require('domain').create();
 var async = require('async');
 var fs = require('fs');
 var jsonfile = require('jsonfile');
+var schedule = require('node-schedule');
+var request = require('request');
+
 var file = '/trivia/trivia_answers.json';
 var gapFillURL = "https://gadfly-api.herokuapp.com/api/gap_fill_questions"
 var mcqURL = "https://gadfly-api.herokuapp.com/api/multiple_choice_questions"
 var articleCount=3;
-var schedule = require('node-schedule');
-var request = require('request');
-
 var trivia_answers = [];
 var trivia_keys = [];
 var choiceReactions = {
@@ -21,6 +21,7 @@ var choiceReactions = {
     3: ':four:',
 }
 
+// Reply pattern library
 replies = {
     idk: new RegExp(/^(idk|not sure|i don\'t know|don\'t know')/i),
     stop: new RegExp(/^(stop|Stop|STOP)/i),
@@ -124,7 +125,7 @@ controller.hears('start trivia now', ['ambient', 'direct_message'], function(bot
         function(callback) {getTriviaQuestions(callback);},
         function(callback) {waitNSecs(10, callback);},
         function(callback) {bot.reply(message, "Let's go!"); callback(null);},
-        function(callback) {bot.reply(message, "Question number 1!"); callback(null);},
+        function(callback) {bot.reply(message, "Question number one!"); callback(null);},
         
         // Article 1
         function(callback) {waitNSecs(5, callback);},
@@ -168,13 +169,6 @@ controller.on('reaction_added', function(bot, message) {
     }
 });
 
-// Trivia
-replies = {
-    idk: new RegExp(/^(idk|not sure|i don\'t know|don\'t know')/i),
-    stop: new RegExp(/^(stop|Stop|STOP)/i),
-};
-
-
 // introduce yourself to the trivia crowd!
 function postTriviaIntro(bot, message, callback) {
     var intro = 'Hi everyone <!here>, it\'s time to play some trivia!' + 
@@ -182,14 +176,15 @@ function postTriviaIntro(bot, message, callback) {
                 '* Click on the reactions to answer. You have 30 seconds for each question.\n' +
                 '* 1 point for answering correctly :nerd_face: \n' + 
                 '* 1 bonus point for answering first :zap:\n' +
-                '* Scores will be posted automatically at the end.\n';
+                '* Scores will be posted automatically at the end.\n' +
+                '-----------------------\n';
     bot.reply(message, intro);
     callback(null);
 }
 
-// Say thanks and that you will post answers soon!
+// Say thanks!
 function postTriviaOutro(bot, message, callback) {
-    var msg = 'Thanks everyone for playing!';
+    var msg = 'Thanks for playing!';
     bot.reply(message, msg);
     callback(null);
 }
@@ -231,6 +226,7 @@ function postTrivia(bot, filename, message, callback) {
     callback(null);
 }
 
+// helper to identify the right answer for a question
 function answerIdx(answer_choices, answer) {
     for(var i=0; i < answer_choices.length; i++) {
         if(answer_choices[i] == answer) {
@@ -240,6 +236,7 @@ function answerIdx(answer_choices, answer) {
     return -1;
 }
 
+// save the correct answer to trivia_keys 
 function saveAnswer(bot, message, correct_answer, callback) {
     var currentChannel = message.channel;
     
@@ -256,6 +253,7 @@ function saveAnswer(bot, message, correct_answer, callback) {
     });
 }
 
+// return answer choices
 function constructAnswerChoices(answer_choices) {
     var choices = "";
     for(var i=0; i < answer_choices.length; i++) {
@@ -306,7 +304,7 @@ function addReactions(bot, message, callback) {
     callback(null);
 }
 
-// Calcualte Scores for trivia
+// Calculate scores for trivia
 function calculateScores(bot, message, callback) {
     // Save score to json
     jsonfile.writeFileSync('trivia_answers.json', trivia_answers, {'flag': 'w'});
@@ -315,13 +313,14 @@ function calculateScores(bot, message, callback) {
     
     var scores = [];
     var last_answer;
+    // Calculate correct answer scores
     for(var i=0; i < trivia_answers.length; i++) {
         if(trivia_answers[i].user in scores) {
             scores[trivia_answers[i].user] = scores[trivia_answers[i].user] + 1;
         } else {
             scores[trivia_answers[i].user] = 1;
         }
-        // Bonus Points for first to answer
+        // Add bonus point for first to answer
         if (last_answer == undefined || last_answer != trivia_answers[i].item.ts) {
             scores[trivia_answers[i].user] = scores[trivia_answers[i].user] + 1;
         }
@@ -331,8 +330,8 @@ function calculateScores(bot, message, callback) {
     for(var i=0; i < trivia_keys.length; i++) {
         bot.reply(message, (i + 1) + ")\t" + trivia_keys[i].replace(":", "").replace(":", ""));
     }
-    
-    // Get User Names
+
+    // Get user names and report scores
     for(u in scores) {
         bot.api.users.info(
             {user: u},
@@ -353,7 +352,6 @@ function waitNSecs(n, callback) {
       callback(null);
     }, n);
 }
-
 
 // for personality
 controller.hears(['who are you','are you a bot', 
