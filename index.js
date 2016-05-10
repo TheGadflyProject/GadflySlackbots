@@ -100,6 +100,7 @@ controller.on('bot_channel_join', function(bot, message) {
 // news me
 controller.hears(['news me', 'News me', 'News Me'], ['direct_message', 'mention', 'direct_mention'], function(bot, message) {
      async.series([
+        function(callback) {waitNSecs(2, callback);},
         function(callback) {bot.reply(message, "Ok," + " " + newsme[getRandomInt(8)], callback(null));},
         function(callback) {getNYTArticles(callback);},
         function(callback) {waitNSecs(8, callback);},
@@ -126,7 +127,7 @@ controller.hears(['news me', 'News me', 'News Me'], ['direct_message', 'mention'
         
         // Exit
         function(callback) {bot.reply(message, "--------------------", callback(null));},
-        function(callback) {waitNSecs(1, callback);},
+        function(callback) {waitNSecs(4, callback);},
         function(callback) {bot.reply(message, "Have fun newsing!", callback(null));},
     ]);
 });
