@@ -105,7 +105,7 @@ controller.hears(['http(.*)'], ['ambient', 'direct_mention', 'mention', 'direct_
             pattern: bot.utterances.yes,
             callback: function(response, convo) {
                 convo.say('Cool, you said: ' + response.text);
-                callGadflyMCQ(url, convo, bot)
+                callGadflyGapFill(url, convo, bot)
             }
         },
         {
@@ -126,7 +126,7 @@ controller.hears(['more', 'next', 'bring it on'], ['direct_mention', 'mention', 
             pattern: bot.utterances.yes,
             callback: function(response, convo) {
                 convo.say('Alright!')
-                callGadflyMCQ(url, convo, bot)
+                callGadflyGapFill(url, convo, bot)
             }
         },
         {
