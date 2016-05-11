@@ -122,7 +122,7 @@ controller.hears(['stop', 'Stop', 'STOP', 'stahp', 'STAHP'],
 controller.hears('start trivia now', ['ambient', 'direct_message'], function(bot, message) {
     async.series([
         function(callback) {postTriviaIntro(bot, message, callback);},
-        function(callback) {getTriviaQuestions(callback);},
+        //function(callback) {getTriviaQuestions(callback);},
         function(callback) {waitNSecs(10, callback);},
         function(callback) {bot.reply(message, "Let's go!"); callback(null);},
         function(callback) {bot.reply(message, "Question number one!"); callback(null);},
@@ -132,7 +132,7 @@ controller.hears('start trivia now', ['ambient', 'direct_message'], function(bot
         function(callback) {postTrivia(bot, './trivia/article0.json', message, callback);},
         function(callback) {waitNSecs(1, callback);},
         function(callback) {addReactions(bot, message, callback);},
-        function(callback) {waitNSecs(20, callback);},
+        function(callback) {waitNSecs(25, callback);},
         
         // Article 2
         function(callback) {bot.reply(message, "Next question!"); callback(null);},
@@ -152,8 +152,8 @@ controller.hears('start trivia now', ['ambient', 'direct_message'], function(bot
         
         // Calculate Score Here
         function(callback) {calculateScores(bot, message, callback);},
-        function(callback) {waitNSecs(10, callback);},
-        function(callback) {postTriviaOutro(bot, message, callback);},
+        function(callback) {waitNSecs(5, callback);},
+        function(callback) {postTriviaOutro(bot, message, callback);}
     ]);
 });
 
@@ -171,7 +171,7 @@ controller.on('reaction_added', function(bot, message) {
 
 // introduce yourself to the trivia crowd!
 function postTriviaIntro(bot, message, callback) {
-    var intro = 'Hi everyone <!here>, it\'s time to play some trivia!' + 
+    var intro = 'Hi everyone <!here>, it\'s time to play some trivia!' + ' ' + 
                 'I\'ve picked some of today\'s popular articles and will ask you 3 questions. \n\n' +
                 '* Click on the reactions to answer. You have 30 seconds for each question.\n' +
                 '* 1 point for answering correctly :nerd_face: \n' + 
@@ -309,7 +309,7 @@ function calculateScores(bot, message, callback) {
     // Save score to json
     jsonfile.writeFileSync('trivia_answers.json', trivia_answers, {'flag': 'w'});
     var currentChannel = message.channel; 
-    bot.reply(message, "*Here are the final scores!* :trophy:");
+    bot.reply(message, "*Here are the final scores!* :trophy: *drumroll*");
     
     var scores = [];
     var last_answer;
