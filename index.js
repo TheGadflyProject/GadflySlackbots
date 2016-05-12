@@ -140,7 +140,7 @@ controller.hears('start trivia now', ['ambient', 'direct_message'], function(bot
         function(callback) {postTrivia(bot, './trivia/article1.json', message, callback);},
         function(callback) {waitNSecs(1, callback);},
         function(callback) {addReactions(bot, message, callback);},
-        function(callback) {waitNSecs(20, callback);},
+        function(callback) {waitNSecs(25, callback);},
       
         // Article 3        
         function(callback) {bot.reply(message, "Time for the last question!");  callback(null);},
@@ -148,7 +148,7 @@ controller.hears('start trivia now', ['ambient', 'direct_message'], function(bot
         function(callback) {postTrivia(bot, './trivia/article2.json', message, callback);},
         function(callback) {waitNSecs(1, callback);},
         function(callback) {addReactions(bot, message, callback);},
-        function(callback) {waitNSecs(20, callback);},
+        function(callback) {waitNSecs(25, callback);},
         
         // Calculate Score Here
         function(callback) {calculateScores(bot, message, callback);},
