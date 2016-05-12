@@ -160,12 +160,14 @@ controller.hears('start trivia now', ['ambient', 'direct_message'], function(bot
 // monitor last question for answers
 controller.on('reaction_added', function(bot, message) {
     // session.storage is the file that stores the id of the message that we care about
-    var targetMsg = fs.readFileSync('session.storage');
-    var correct_answer = trivia_keys[message.item.ts].replace(":", "").replace(":", "");
-    if (message.user != bot.identity.id &&
-        message.item.ts == targetMsg &&
-        message.reaction == correct_answer) {
-        trivia_answers.push(message);
+    if (message.reaction == choiceReactions[0] || message.reaction == choiceReactions[1] || message.reaction == choiceReactions[2] || message.reaction == choiceReactions[3]) {
+        var targetMsg = fs.readFileSync('session.storage');
+        var correct_answer = trivia_keys[message.item.ts].replace(":", "").replace(":", "");
+        if (message.user != bot.identity.id &&
+            message.item.ts == targetMsg &&
+            message.reaction == correct_answer) {
+            trivia_answers.push(message);
+        }
     }
 });
 
