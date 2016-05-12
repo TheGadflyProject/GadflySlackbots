@@ -17,8 +17,9 @@ var newsme = ['*flux capacitating the news*', '*calling the news falcon*', '*sum
 
 // A pattern library to match specific conversational constructs
 replies = {
-    idk: new RegExp(/^(idk|not sure|i don\'t know|don\'t know')/i),
+    idk: new RegExp(/^(idk|not sure|i don\'t know|don\'t know)/i),
     stop: new RegExp(/^(stop|Stop|STOP)/i),
+    greeting: ['hi', 'hello', 'ho', 'yo', 'sup', 'hey', 'hola', 'hi there', 'hey there', 'greetings']
 };
 
 /**
@@ -109,19 +110,19 @@ controller.hears(['news me', 'News me', 'News Me'], ['direct_message', 'mention'
         function(callback) {bot.reply(message, "--------------------", callback(null));},
         function(callback) {waitNSecs(2, callback);},
         function(callback) {bot.reply(message, "First!"); callback(null);},
-        function(callback) {postArticle(bot, dir + '0.json', message, callback);},
+        function(callback) {postArticle(bot, './articles/article0.json', message, callback);},
         function(callback) {bot.reply(message, articleURLs[0], callback(null));},
         function(callback) {waitNSecs(8, callback);},
         
         // Article 2
         function(callback) {bot.reply(message, "Next!"); callback(null);},
-        function(callback) {postArticle(bot, dir + '1.json', message, callback);},
+        function(callback) {postArticle(bot, './articles/article1.json', message, callback);},
         function(callback) {bot.reply(message, articleURLs[1], callback(null));},
         function(callback) {waitNSecs(8, callback);},
       
         // Article 3        
         function(callback) {bot.reply(message, "Finally!");  callback(null);},
-        function(callback) {postArticle(bot, dir + '2.json', message, callback);},
+        function(callback) {postArticle(bot, './articles/article2.json', message, callback);},
         function(callback) {bot.reply(message, articleURLs[2], callback(null));},
         function(callback) {waitNSecs(8, callback);},
         
@@ -144,14 +145,14 @@ function getNYTArticles(callback) {
         body = JSON.parse(body);
         
         for(var i=0; i < articleCount; i++) {
-            var filename = dir + i + '.json';
+            var filename = './articles/article' + i + '.json';
             articleURLs[i] = body.results[i].url;
             apiURL = gapFillURL + "?url=" + body.results[i].url + '&limit=1';
             r = request.get(apiURL)
                 .on('error', function(err) {
                     console.log(err)
                 })
-                .pipe(fs.createWriteStream(dir + i + '.json'));
+                .pipe(fs.createWriteStream('./articles/article' + i + '.json'));
             }
         }
     );
@@ -504,6 +505,7 @@ controller.on('reaction_added', function(bot, message) {
 })
 
 // all un-handled direct mentions get a reaction and a pat response!
-controller.on('direct_message, mention, direct_mention', function(bot, message) {
-    bot.reply(message, 'Hi there! I\'m a bot. If you paste a news article URL here, I can ask you questions about it.');
+controller.hears(replies.greeting, ['direct_message', 'mention', 'direct_mention'], function(bot, message) {
+    bot.reply(message, 'Hi there! I\'m a bot. Say \'news me\' to get the news.');
+    bot.reply(message, 'If you paste a news article URL here, I can ask you questions about it.');
 });
