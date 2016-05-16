@@ -123,7 +123,7 @@ controller.hears('start trivia now', ['ambient', 'direct_message'], function(bot
     async.series([
         function(callback) {postTriviaIntro(bot, message, callback);},
         //function(callback) {getTriviaQuestions(callback);},
-        function(callback) {waitNSecs(10, callback);},
+        function(callback) {waitNSecs(5, callback);},
         function(callback) {bot.reply(message, "Let's go!"); callback(null);},
         function(callback) {bot.reply(message, "Question number one!"); callback(null);},
         
@@ -140,7 +140,7 @@ controller.hears('start trivia now', ['ambient', 'direct_message'], function(bot
         function(callback) {postTrivia(bot, './trivia/article1.json', message, callback);},
         function(callback) {waitNSecs(1, callback);},
         function(callback) {addReactions(bot, message, callback);},
-        function(callback) {waitNSecs(25, callback);},
+        function(callback) {waitNSecs(20, callback);},
       
         // Article 3        
         function(callback) {bot.reply(message, "Time for the last question!");  callback(null);},
@@ -148,7 +148,7 @@ controller.hears('start trivia now', ['ambient', 'direct_message'], function(bot
         function(callback) {postTrivia(bot, './trivia/article2.json', message, callback);},
         function(callback) {waitNSecs(1, callback);},
         function(callback) {addReactions(bot, message, callback);},
-        function(callback) {waitNSecs(25, callback);},
+        function(callback) {waitNSecs(20, callback);},
         
         // Calculate Score Here
         function(callback) {calculateScores(bot, message, callback);},
@@ -160,7 +160,9 @@ controller.hears('start trivia now', ['ambient', 'direct_message'], function(bot
 // monitor last question for answers
 controller.on('reaction_added', function(bot, message) {
     // session.storage is the file that stores the id of the message that we care about
-    if (message.reaction == choiceReactions[0] || message.reaction == choiceReactions[1] || message.reaction == choiceReactions[2] || message.reaction == choiceReactions[3]) {
+
+    console.log(message.reaction);
+    if (message.reaction == "one" || message.reaction == "two" || message.reaction == "three" || message.reaction == "four") {
         var targetMsg = fs.readFileSync('session.storage');
         var correct_answer = trivia_keys[message.item.ts].replace(":", "").replace(":", "");
         if (message.user != bot.identity.id &&
